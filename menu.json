@@ -1,57 +1,92 @@
-let products = []; // Shuru mein khali rakhenge
-let cart = [];
-
-// 1. JSON se data load karne ka function
-async function loadMenu() {
-    try {
-        const response = await fetch('YAHAN_APNA_GITHUB_RAW_URL_DAALO');
-        products = await response.json();
-        renderMenu(); // Data aane ke baad menu dikhao
-    } catch (error) {
-        console.error("Menu load nahi ho paya:", error);
-        alert("Menu update hone mein thoda time lag raha hai, kripya refresh karein.");
-    }
-}
-
-// 2. Menu render karne ka function (Wahi purana logic, bas thoda sa saaf kiya hai)
-function renderMenu() {
-    const menuGrid = document.getElementById('menu-items');
-    menuGrid.innerHTML = products.map((p, idx) => {
-        if (p.isDropdown) {
-            return `
-            <div class="item-card">
-              <img src="${p.img}">
-              <div class="card-body">
-                <h3>${p.name}</h3>
-                <select class="variant-select" id="sel-${p.id}" onchange="updatePrice('${p.id}')">
-                  ${p.options.map(o => `<option value="${o.label}" data-price="${o.price}" data-min="${o.min}">${o.label}</option>`).join('')}
-                </select>
-                <div class="price-tag" id="pr-${p.id}">₹${p.options[0].price}</div>
-                <div class="qty-control">
-                  <button class="qty-btn" onclick="changeQty('${p.id}',-1)">-</button>
-                  <input type="number" class="qty-val" id="qty-${p.id}" value="${p.options[0].min}" readonly>
-                  <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
-                </div>
-              </div>
-              <button class="add-to-cart" onclick="addDropToCart('${p.id}')">Add to Cart</button>
-            </div>`;
-        }
-        return `
-        <div class="item-card">
-          <img src="${p.img}">
-          <div class="card-body">
-            <h3>${p.name}</h3>
-            <div class="price-tag">₹${p.price}${p.isKg?'/kg':''}</div>
-            <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty('${p.id}',-1)">-</button>
-              <input type="number" class="qty-val" id="qty-${p.id}" value="${p.min}" readonly>
-              <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
-            </div>
-          </div>
-          <button class="add-to-cart" onclick="addFixedToCart(${idx})">Add to Cart</button>
-        </div>`;
-    }).join('');
-}
-
-// Page load hote hi menu load karo
-window.onload = loadMenu;
+[
+  {
+    "id": 1,
+    "name": "Regular Samosa",
+    "price": 18,
+    "min": 25,
+    "step": 5,
+    "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
+    "isKg": false
+  },
+  {
+    "id": 2,
+    "name": "Mini Samosa",
+    "price": 15,
+    "min": 25,
+    "step": 5,
+    "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
+    "isKg": false
+  },
+  {
+    "id": 3,
+    "name": "Vada Pav",
+    "price": 25,
+    "min": 25,
+    "step": 5,
+    "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400",
+    "isKg": false
+  },
+  {
+    "id": 4,
+    "name": "Khandvi",
+    "price": 360,
+    "min": 0.5,
+    "step": 0.25,
+    "img": "https://i0.wp.com/www.blissofcooking.com/wp-content/uploads/2019/04/Khandvi-MOP.jpg",
+    "isKg": true
+  },
+  {
+    "id": 5,
+    "name": "Jain Samosa",
+    "price": 25,
+    "min": 25,
+    "step": 5,
+    "img": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400",
+    "isKg": false
+  },
+  {
+    "id": 6,
+    "name": "Samosa Pav",
+    "price": 25,
+    "min": 25,
+    "step": 5,
+    "img": "https://freeimage.host/i/qaqdvLX",
+    "isKg": false
+  },
+  {
+    "id": 7,
+    "name": "Corn Roll",
+    "price": 20,
+    "min": 25,
+    "step": 5,
+    "img": "https://cdn.sanity.io/images/f3knbc2s/production/3af47d3f6a4446dd13e94606e1d1619142f355dd-2880x1701.jpg",
+    "isKg": false
+  },
+  {
+    "id": 8,
+    "name": "Mini Corn Roll",
+    "price": 15,
+    "min": 50,
+    "step": 5,
+    "img": "https://www.yummyfoodrecipes.com/resources/picture/org/Crispy-Corn-Rolls-Recipe.jpg",
+    "isKg": false
+  },
+  {
+    "id": 9,
+    "name": "Khasta Kachori",
+    "price": 360,
+    "min": 0.5,
+    "step": 0.25,
+    "img": "https://images.unsplash.com/photo-1626500155550-1794c1f9630c?w=400",
+    "isKg": true
+  },
+  {
+    "id": 10,
+    "name": "Khaman Dhokla",
+    "price": 360,
+    "min": 0.5,
+    "step": 0.25,
+    "img": "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/khaman-dhokla-recipe.jpg",
+    "isKg": true
+  }
+]
