@@ -1,92 +1,61 @@
 [
   {
-    "id": 1,
-    "name": "Regular Samosa",
-    "price": 19,
-    "min": 25,
-    "step": 5,
+    "id": "group-snacks",
+    "name": "Samosa & Corn Roll",
+    "isDropdown": true,
     "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
-    "isKg": false
+    "options": [
+      {
+        "label": "Regular Samosa",
+        "price": 18,
+        "min": 25
+      },
+      {
+        "label": "Mini Samosa",
+        "price": 15,
+        "min": 25
+      },
+      {
+        "label": "Jain Samosa",
+        "price": 20,
+        "min": 25
+      },
+      {
+        "label": "Corn Roll",
+        "price": 22,
+        "min": 20
+      }
+    ]
   },
   {
-    "id": 2,
-    "name": "Mini Samosa",
-    "price": 15,
-    "min": 25,
-    "step": 5,
-    "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
-    "isKg": false
-  },
-  {
-    "id": 3,
+    "id": "3",
     "name": "Vada Pav",
     "price": 25,
     "min": 25,
-    "step": 5,
-    "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400",
-    "isKg": false
+    "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400"
   },
   {
-    "id": 4,
+    "id": "7",
     "name": "Khandvi",
     "price": 360,
     "min": 0.5,
-    "step": 0.25,
-    "img": "https://i0.wp.com/www.blissofcooking.com/wp-content/uploads/2019/04/Khandvi-MOP.jpg",
-    "isKg": true
+    "isKg": true,
+    "img": "https://i0.wp.com/www.blissofcooking.com/wp-content/uploads/2019/04/Khandvi-MOP.jpg"
   },
   {
-    "id": 5,
-    "name": "Jain Samosa",
-    "price": 25,
-    "min": 25,
-    "step": 5,
-    "img": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400",
-    "isKg": false
-  },
-  {
-    "id": 6,
-    "name": "Samosa Pav",
-    "price": 25,
-    "min": 25,
-    "step": 5,
-    "img": "https://freeimage.host/i/qaqdvLX",
-    "isKg": false
-  },
-  {
-    "id": 7,
-    "name": "Corn Roll",
-    "price": 20,
-    "min": 25,
-    "step": 5,
-    "img": "https://cdn.sanity.io/images/f3knbc2s/production/3af47d3f6a4446dd13e94606e1d1619142f355dd-2880x1701.jpg",
-    "isKg": false
-  },
-  {
-    "id": 8,
-    "name": "Mini Corn Roll",
-    "price": 15,
-    "min": 50,
-    "step": 5,
-    "img": "https://www.yummyfoodrecipes.com/resources/picture/org/Crispy-Corn-Rolls-Recipe.jpg",
-    "isKg": false
-  },
-  {
-    "id": 9,
+    "id": "8",
     "name": "Khasta Kachori",
     "price": 360,
     "min": 0.5,
-    "step": 0.25,
-    "img": "https://images.unsplash.com/photo-1626500155550-1794c1f9630c?w=400",
-    "isKg": true
+    "isKg": true,
+    "img": "https://images.unsplash.com/photo-1626500155550-1794c1f9630c?w=400"
   },
   {
-    "id": 10,
+    "id": "9",
     "name": "Khaman Dhokla",
     "price": 360,
     "min": 0.5,
-    "step": 0.25,
-    "img": "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/khaman-dhokla-recipe.jpg",
-    "isKg": true
+    "isKg": true,
+    "img": "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/khaman-dhokla-recipe.jpg"
   }
 ]
