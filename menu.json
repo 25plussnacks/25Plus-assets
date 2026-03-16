@@ -24,7 +24,7 @@
   {
     "id": "3",
     "name": "Vada Pav",
-    "price": 25,
+    "price": 21,
     "min": 5,
     "step": 5,
     "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400"
