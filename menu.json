@@ -7,12 +7,12 @@
     "options": [
       {
         "label": "Regular Samosa",
-        "price": 18,
+        "price": 19,
         "min": 25
       },
       {
         "label": "Mini Samosa",
-        "price": 15,
+        "price": 17,
         "min": 25
       },
       {
