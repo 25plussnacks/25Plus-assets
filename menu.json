@@ -1,30 +1,24 @@
 [
   {
-    "id": "group-snacks",
-    "name": "Samosa & Corn Roll",
+    "id": "samosa-group",
+    "name": "Samosas",
     "isDropdown": true,
     "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
     "options": [
-      {
-        "label": "Regular Samosa",
-        "price": 21,
-        "min": 25
-      },
-      {
-        "label": "Mini Samosa",
-        "price": 31,
-        "min": 25
-      },
-      {
-        "label": "Jain Samosa",
-        "price": 21,
-        "min": 25
-      },
-      {
-        "label": "Corn Roll",
-        "price": 22,
-        "min": 20
-      }
+      { "label": "Regular Samosa", "price": 21, "min": 25, "step": 5 },
+      { "label": "Mini Samosa", "price": 31, "min": 25, "step": 5 },
+      { "label": "Jain Samosa", "price": 21, "min": 25, "step": 5 },
+      { "label": "Jain Mini Samosa", "price": 31, "min": 25, "step": 5 }
+    ]
+  },
+  {
+    "id": "corn-group",
+    "name": "Corn Rolls",
+    "isDropdown": true,
+    "img": "https://images.unsplash.com/photo-1541529086526-db283c563270?w=400",
+    "options": [
+      { "label": "Regular Corn Roll", "price": 22, "min": 20, "step": 5 },
+      { "label": "Mini Corn Roll", "price": 25, "min": 20, "step": 5 }
     ]
   },
   {
@@ -32,6 +26,7 @@
     "name": "Vada Pav",
     "price": 25,
     "min": 5,
+    "step": 5,
     "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400"
   },
   {
@@ -39,6 +34,7 @@
     "name": "Khandvi",
     "price": 360,
     "min": 0.250,
+    "step": 0.250,
     "isKg": true,
     "img": "https://i0.wp.com/www.blissofcooking.com/wp-content/uploads/2019/04/Khandvi-MOP.jpg"
   },
@@ -47,6 +43,7 @@
     "name": "Khasta Kachori",
     "price": 360,
     "min": 0.250,
+    "step": 0.250,
     "isKg": true,
     "img": "https://images.unsplash.com/photo-1626500155550-1794c1f9630c?w=400"
   },
@@ -55,6 +52,7 @@
     "name": "Khaman Dhokla",
     "price": 360,
     "min": 0.250,
+    "step": 0.250,
     "isKg": true,
     "img": "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/khaman-dhokla-recipe.jpg"
   }
