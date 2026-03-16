@@ -1,0 +1,57 @@
+let products = []; // Shuru mein khali rakhenge
+let cart = [];
+
+// 1. JSON se data load karne ka function
+async function loadMenu() {
+    try {
+        const response = await fetch('YAHAN_APNA_GITHUB_RAW_URL_DAALO');
+        products = await response.json();
+        renderMenu(); // Data aane ke baad menu dikhao
+    } catch (error) {
+        console.error("Menu load nahi ho paya:", error);
+        alert("Menu update hone mein thoda time lag raha hai, kripya refresh karein.");
+    }
+}
+
+// 2. Menu render karne ka function (Wahi purana logic, bas thoda sa saaf kiya hai)
+function renderMenu() {
+    const menuGrid = document.getElementById('menu-items');
+    menuGrid.innerHTML = products.map((p, idx) => {
+        if (p.isDropdown) {
+            return `
+            <div class="item-card">
+              <img src="${p.img}">
+              <div class="card-body">
+                <h3>${p.name}</h3>
+                <select class="variant-select" id="sel-${p.id}" onchange="updatePrice('${p.id}')">
+                  ${p.options.map(o => `<option value="${o.label}" data-price="${o.price}" data-min="${o.min}">${o.label}</option>`).join('')}
+                </select>
+                <div class="price-tag" id="pr-${p.id}">₹${p.options[0].price}</div>
+                <div class="qty-control">
+                  <button class="qty-btn" onclick="changeQty('${p.id}',-1)">-</button>
+                  <input type="number" class="qty-val" id="qty-${p.id}" value="${p.options[0].min}" readonly>
+                  <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
+                </div>
+              </div>
+              <button class="add-to-cart" onclick="addDropToCart('${p.id}')">Add to Cart</button>
+            </div>`;
+        }
+        return `
+        <div class="item-card">
+          <img src="${p.img}">
+          <div class="card-body">
+            <h3>${p.name}</h3>
+            <div class="price-tag">₹${p.price}${p.isKg?'/kg':''}</div>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty('${p.id}',-1)">-</button>
+              <input type="number" class="qty-val" id="qty-${p.id}" value="${p.min}" readonly>
+              <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
+            </div>
+          </div>
+          <button class="add-to-cart" onclick="addFixedToCart(${idx})">Add to Cart</button>
+        </div>`;
+    }).join('');
+}
+
+// Page load hote hi menu load karo
+window.onload = loadMenu;
