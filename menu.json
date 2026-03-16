@@ -7,12 +7,12 @@
     "options": [
       {
         "label": "Regular Samosa",
-        "price": 19,
+        "price": 21,
         "min": 25
       },
       {
         "label": "Mini Samosa",
-        "price": 17,
+        "price": 31,
         "min": 25
       },
       {
@@ -31,14 +31,14 @@
     "id": "3",
     "name": "Vada Pav",
     "price": 25,
-    "min": 25,
+    "min": 5,
     "img": "https://images.unsplash.com/photo-1626132646529-5003375a95d2?w=400"
   },
   {
     "id": "7",
     "name": "Khandvi",
     "price": 360,
-    "min": 0.5,
+    "min": 0.250,
     "isKg": true,
     "img": "https://i0.wp.com/www.blissofcooking.com/wp-content/uploads/2019/04/Khandvi-MOP.jpg"
   },
@@ -46,7 +46,7 @@
     "id": "8",
     "name": "Khasta Kachori",
     "price": 360,
-    "min": 0.5,
+    "min": 0.250,
     "isKg": true,
     "img": "https://images.unsplash.com/photo-1626500155550-1794c1f9630c?w=400"
   },
@@ -54,7 +54,7 @@
     "id": "9",
     "name": "Khaman Dhokla",
     "price": 360,
-    "min": 0.5,
+    "min": 0.250,
     "isKg": true,
     "img": "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/04/khaman-dhokla-recipe.jpg"
   }
