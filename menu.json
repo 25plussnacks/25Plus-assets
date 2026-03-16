@@ -6,9 +6,9 @@
     "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
     "options": [
       { "label": "Regular Samosa", "price": 21, "min": 5, "step": 5 },
-      { "label": "Mini Samosa", "price": 31, "min": 5, "step": 5 },
+      { "label": "Mini Samosa", "price": 31, "min": 7, "step": 5 },
       { "label": "Jain Samosa", "price": 21, "min": 5, "step": 5 },
-      { "label": "Jain Mini Samosa", "price": 31, "min": 5, "step": 5 }
+      { "label": "Jain Mini Samosa", "price": 31, "min": 7, "step": 5 }
     ]
   },
   {
@@ -18,7 +18,7 @@
     "img": "https://images.unsplash.com/photo-1541529086526-db283c563270?w=400",
     "options": [
       { "label": "Regular Corn Roll", "price": 22, "min": 5, "step": 5 },
-      { "label": "Mini Corn Roll", "price": 25, "min": 5, "step": 5 }
+      { "label": "Mini Corn Roll", "price": 25, "min": 15, "step": 5 }
     ]
   },
   {
