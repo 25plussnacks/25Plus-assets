@@ -6,9 +6,9 @@
     "img": "https://images.unsplash.com/photo-1601050638917-3f0483253721?w=400",
     "options": [
       { "label": "Regular Samosa", "price": 21, "min": 5, "step": 1 },
-      { "label": "Mini Samosa", "price": 31, "min": 5, "step": 1 },
-      { "label": "Jain Samosa", "price": 21, "min": 5, "step": 1 },
-      { "label": "Jain Mini Samosa", "price": 31, "min": 5, "step": 1 }
+      { "label": "Mini Samosa", "price": 81, "min": 15, "step": 1 },
+      { "label": "Jain Samosa", "price": 91, "min": 10, "step": 1 },
+      { "label": "Jain Mini Samosa", "price": 51, "min": 11, "step": 1 }
     ]
   },
   {
