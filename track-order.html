@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Your Order | 25 Plus Snacks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent:#d35400; --dark:#1e272e; --success:#27ae60; --bg-overlay:rgba(255,252,249,0.95); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--dark); min-height:100vh;
+      background-image:linear-gradient(var(--bg-overlay),var(--bg-overlay)),
+      url('https://images.unsplash.com/photo-1626500155550-1794c1f9630c?q=60&w=1600&auto=format&fit=crop');
+      background-size:cover; background-attachment:fixed; }
+
+    header { background:var(--dark); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+    header a { color:white; text-decoration:none; font-weight:800; font-size:1.1rem; }
+    header a span { color:var(--accent); }
+    header .back { font-size:0.85rem; color:rgba(255,255,255,0.6); display:flex; align-items:center; gap:6px; }
+    header .back:hover { color:white; }
+
+    .container { max-width:620px; margin:40px auto; padding:0 20px 60px; }
+
+    /* Search box */
+    .search-card { background:white; border-radius:24px; padding:32px; box-shadow:0 10px 40px rgba(0,0,0,0.08); margin-bottom:24px; }
+    .search-card h1 { font-size:1.5rem; margin-bottom:6px; }
+    .search-card p  { color:#888; font-size:0.9rem; margin-bottom:24px; }
+    .input-row { display:flex; gap:10px; }
+    .input-row input { flex:1; padding:14px 18px; border:2px solid #eee; border-radius:12px; font-family:inherit; font-size:1rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; outline:none; transition:0.2s; }
+    .input-row input:focus { border-color:var(--accent); }
+    .input-row input::placeholder { font-weight:400; letter-spacing:0; text-transform:none; color:#bbb; }
+    .btn-track { background:var(--accent); color:white; border:none; padding:14px 24px; border-radius:12px; font-weight:800; font-size:0.95rem; cursor:pointer; font-family:inherit; white-space:nowrap; transition:0.2s; }
+    .btn-track:hover { background:#b94600; }
+    .btn-track:disabled { opacity:0.6; pointer-events:none; }
+
+    /* Error */
+    .error-box { background:#fff0f0; border:1.5px solid #e74c3c; border-radius:12px; padding:14px 18px; color:#c0392b; font-size:0.85rem; font-weight:600; display:none; margin-top:12px; }
+
+    /* Result card */
+    #result { display:none; }
+    .result-card { background:white; border-radius:24px; padding:28px; box-shadow:0 10px 40px rgba(0,0,0,0.08); }
+
+    /* Order header */
+    .order-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:20px; border-bottom:2px solid #f1f2f6; }
+    .order-ref { font-size:1.4rem; font-weight:900; color:var(--dark); letter-spacing:1px; }
+    .order-meta { font-size:0.8rem; color:#aaa; margin-top:4px; }
+    .order-total { text-align:right; }
+    .order-total .amount { font-size:1.3rem; font-weight:900; color:var(--accent); }
+    .order-total .type-badge { display:inline-block; font-size:0.72rem; font-weight:800; padding:3px 10px; border-radius:20px; margin-top:4px; }
+    .type-delivery { background:#e8f4fd; color:#1a6fa3; }
+    .type-pickup   { background:#eafaf1; color:#1e7e34; }
+
+    /* Status timeline */
+    .timeline { margin:20px 0; }
+    .timeline-step { display:flex; align-items:flex-start; gap:14px; margin-bottom:6px; position:relative; }
+    .step-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; transition:0.3s; }
+    .step-icon.done    { background:var(--success); color:white; }
+    .step-icon.active  { background:var(--accent); color:white; box-shadow:0 0 0 4px rgba(211,84,0,0.15); }
+    .step-icon.pending { background:#f1f2f6; color:#ccc; }
+    .step-line { width:2px; height:28px; margin-left:17px; margin-top:2px; margin-bottom:2px; border-radius:2px; }
+    .step-line.done    { background:var(--success); }
+    .step-line.pending { background:#f1f2f6; }
+    .step-content { padding-top:6px; }
+    .step-label  { font-weight:700; font-size:0.9rem; }
+    .step-label.done    { color:var(--success); }
+    .step-label.active  { color:var(--accent); }
+    .step-label.pending { color:#ccc; }
+    .step-time { font-size:0.75rem; color:#aaa; margin-top:2px; }
+
+    /* Cancelled banner */
+    .cancelled-banner { background:#fff0f0; border:1.5px solid #e74c3c; border-radius:12px; padding:16px; text-align:center; color:#c0392b; font-weight:700; margin:16px 0; }
+
+    /* Delivery info */
+    .info-section { margin-top:20px; padding-top:20px; border-top:2px solid #f1f2f6; }
+    .info-section h3 { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#aaa; margin-bottom:12px; }
+    .info-row { display:flex; gap:8px; margin-bottom:8px; font-size:0.85rem; }
+    .info-row .label { color:#aaa; width:80px; flex-shrink:0; }
+    .info-row .value { color:var(--dark); font-weight:600; }
+
+    /* Items */
+    .items-section { margin-top:20px; padding-top:20px; border-top:2px solid #f1f2f6; }
+    .items-section h3 { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#aaa; margin-bottom:12px; }
+    .item-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f9f9f9; font-size:0.85rem; }
+    .item-row:last-child { border-bottom:none; }
+    .item-name  { color:var(--dark); font-weight:600; }
+    .item-meta  { color:#aaa; font-size:0.78rem; margin-top:2px; }
+    .item-price { font-weight:800; color:var(--accent); }
+
+    /* Pricing */
+    .pricing-section { margin-top:16px; padding-top:16px; border-top:1px solid #f1f2f6; }
+    .price-row { display:flex; justify-content:space-between; font-size:0.85rem; color:#666; margin-bottom:6px; }
+    .price-row.total { font-size:1.1rem; font-weight:900; color:var(--accent); margin-top:8px; padding-top:8px; border-top:2px solid #f1f2f6; }
+
+    /* Help footer */
+    .help-row { text-align:center; margin-top:20px; font-size:0.82rem; color:#aaa; }
+    .help-row a { color:var(--accent); font-weight:700; text-decoration:none; }
+
+    /* Loading spinner */
+    .spinner { display:inline-block; width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.6s linear infinite; vertical-align:middle; margin-right:6px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="javascript:history.back()"><span>25</span> Plus Snacks</a>
+    <a href="javascript:history.back()" class="back"><i class="fas fa-arrow-left"></i> Back to menu</a>
+  </header>
+
+  <div class="container">
+
+    <div class="search-card">
+      <h1>Track Your Order</h1>
+      <p>Enter your Order ID from the confirmation email to see live status.</p>
+      <div class="input-row">
+        <input type="text" id="order-id-input" placeholder="e.g. 26C26K47" maxlength="8" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter') trackOrder()">
+        <button class="btn-track" id="track-btn" onclick="trackOrder()">Track</button>
+      </div>
+      <div class="error-box" id="error-box"></div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="help-row">
+      Can't find your order? Call us: <a href="tel:+919769022881">+91 97690 22881</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL  = 'https://qkemufgipqtqqsmzzjlb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZW11ZmdpcHF0cXFzbXp6amxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDkzNjYsImV4cCI6MjA4OTk4NTM2Nn0.fNclTYljlN2qze9_wMuzDPh68l0Ve15OkNY7Zl6aFPs';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    const STEPS = [
+      { key: 'pending',          icon: 'fa-clock',             label: 'Order Placed' },
+      { key: 'confirmed',        icon: 'fa-check-circle',      label: 'Confirmed' },
+      { key: 'preparing',        icon: 'fa-utensils',          label: 'Being Prepared' },
+      { key: 'out_for_delivery', icon: 'fa-truck',             label: 'Out for Delivery' },
+      { key: 'delivered',        icon: 'fa-house-chimney',     label: 'Delivered' }
+    ];
+
+    const STATUS_ORDER = ['pending','confirmed','preparing','out_for_delivery','delivered'];
+
+    // Auto-track if order ref is in URL query param e.g. track-order.html?ref=26C26K47
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const ref    = params.get('ref') || params.get('order');
+      if (ref) {
+        document.getElementById('order-id-input').value = ref.toUpperCase();
+        trackOrder();
+      }
+    };
+
+    async function trackOrder() {
+      const input  = document.getElementById('order-id-input');
+      const ref    = input.value.trim().toUpperCase();
+      const errBox = document.getElementById('error-box');
+      const btn    = document.getElementById('track-btn');
+      const result = document.getElementById('result');
+
+      errBox.style.display = 'none';
+      result.style.display = 'none';
+
+      if (ref.length < 6) {
+        errBox.innerText = 'Please enter your Order ID (e.g. 26C26K47)';
+        errBox.style.display = 'block'; return;
+      }
+
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="spinner"></span> Tracking...';
+
+      try {
+        const { data: order, error } = await sb
+          .from('orders')
+          .select(`*, order_items(*)`)
+          .eq('order_ref', ref)
+          .single();
+
+        if (error || !order) {
+          errBox.innerText = `Order "${ref}" not found. Please check the ID from your confirmation email.`;
+          errBox.style.display = 'block';
+          btn.disabled = false; btn.innerHTML = 'Track'; return;
+        }
+
+        renderOrder(order);
+        result.style.display = 'block';
+        result.scrollIntoView({ behavior:'smooth', block:'start' });
+
+      } catch(e) {
+        errBox.innerText = 'Something went wrong. Please try again.';
+        errBox.style.display = 'block';
+      }
+
+      btn.disabled = false; btn.innerHTML = 'Track';
+    }
+
+    function renderOrder(order) {
+      const result       = document.getElementById('result');
+      const isCancelled  = order.status === 'cancelled';
+      const isPickup     = order.order_type === 'pickup';
+      const currentIdx   = STATUS_ORDER.indexOf(order.status);
+
+      const scheduledTime = new Date(order.scheduled_time).toLocaleString('en-IN', {
+        weekday:'short', day:'numeric', month:'short', year:'numeric',
+        hour:'2-digit', minute:'2-digit', timeZone:'Asia/Kolkata'
+      });
+      const placedTime = new Date(order.created_at).toLocaleString('en-IN', {
+        day:'numeric', month:'short', year:'numeric',
+        hour:'2-digit', minute:'2-digit', timeZone:'Asia/Kolkata'
+      });
+
+      // Timeline HTML
+      let timelineHtml = '';
+      if (isCancelled) {
+        timelineHtml = `<div class="cancelled-banner"><i class="fas fa-times-circle"></i> This order has been cancelled. Please call us for assistance.</div>`;
+      } else {
+        STEPS.forEach((step, i) => {
+          const isDone   = i < currentIdx;
+          const isActive = i === currentIdx;
+          const state    = isDone ? 'done' : isActive ? 'active' : 'pending';
+
+          timelineHtml += `
+            <div class="timeline-step">
+              <div class="step-icon ${state}"><i class="fas ${step.icon}"></i></div>
+              <div class="step-content">
+                <div class="step-label ${state}">${step.label}</div>
+                ${isActive ? `<div class="step-time">Current status</div>` : ''}
+              </div>
+            </div>`;
+
+          // Connecting line between steps (not after last)
+          if (i < STEPS.length - 1) {
+            timelineHtml += `<div class="step-line ${isDone ? 'done' : 'pending'}"></div>`;
+          }
+        });
+      }
+
+      // Items HTML
+      const itemsHtml = (order.order_items || []).map(item => `
+        <div class="item-row">
+          <div>
+            <div class="item-name">${item.product_name}${item.variant ? ' <span style="font-weight:400;color:#aaa;">('+item.variant+')</span>' : ''}</div>
+            <div class="item-meta">${item.qty_per_packet} ${item.unit} &times; ${item.packets} pkt</div>
+          </div>
+          <div class="item-price">&#8377;${item.line_total.toFixed(0)}</div>
+        </div>`).join('');
+
+      result.innerHTML = `
+        <div class="result-card">
+
+          <!-- Header -->
+          <div class="order-header">
+            <div>
+              <div class="order-ref">${order.order_ref}</div>
+              <div class="order-meta">Placed on ${placedTime}</div>
+            </div>
+            <div class="order-total">
+              <div class="amount">&#8377;${order.total_amount}</div>
+              <div class="type-badge ${isPickup ? 'type-pickup' : 'type-delivery'}">
+                ${isPickup ? 'Store Pickup' : 'Delivery'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="timeline">${timelineHtml}</div>
+
+          <!-- Delivery / Pickup info -->
+          <div class="info-section">
+            <h3>${isPickup ? 'Pickup Details' : 'Delivery Details'}</h3>
+            <div class="info-row">
+              <span class="label">${isPickup ? 'Pickup' : 'Delivery'}</span>
+              <span class="value">${scheduledTime}</span>
+            </div>
+            ${!isPickup ? `
+            <div class="info-row">
+              <span class="label">Address</span>
+              <span class="value">${order.customer_address}</span>
+            </div>` : `
+            <div class="info-row">
+              <span class="label">Location</span>
+              <span class="value">Sandhurst Road Station, Dongri, Mumbai</span>
+            </div>`}
+          </div>
+
+          <!-- Items -->
+          <div class="items-section">
+            <h3>Items Ordered</h3>
+            ${itemsHtml}
+          </div>
+
+          <!-- Pricing -->
+          <div class="pricing-section">
+            <div class="price-row"><span>Subtotal</span><span>&#8377;${order.subtotal}</span></div>
+            ${order.delivery_charge > 0 ? `<div class="price-row"><span>Delivery charge</span><span>&#8377;${order.delivery_charge}</span></div>` : ''}
+            ${order.discount_amount > 0 ? `<div class="price-row" style="color:var(--success)"><span>Pickup discount (5%)</span><span>-&#8377;${order.discount_amount}</span></div>` : ''}
+            <div class="price-row total"><span>Total</span><span>&#8377;${order.total_amount}</span></div>
+          </div>
+
+        </div>
+
+        <div class="help-row" style="margin-top:16px;">
+          Need help? Call us: <a href="tel:+919769022881">+91 97690 22881</a>
+        </div>`;
+    }
+  </script>
+</body>
+</html>
