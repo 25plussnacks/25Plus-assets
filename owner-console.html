@@ -256,13 +256,14 @@
     const now=new Date();
     const start=new Date(now); start.setDate(start.getDate()-1); start.setHours(0,0,0,0);
 
-    const [oR,iR,bR,mR] = await Promise.all([
+    const todayStr = new Date().toISOString().slice(0,10);
+    const [oR,iR,cR,mR] = await Promise.all([
       sb.from('orders').select('*, order_items(*)').gte('scheduled_time',start.toISOString()).order('scheduled_time',{ascending:true}),
       sb.from('inventory').select('*').order('product_name').order('variant'),
-      sb.from('capacity_bookings').select('*'),
+      sb.from('capacity_usage').select('*').gte('order_date', todayStr),
       fetch(MENU_URL+'?v='+Date.now()).then(r=>r.json()).catch(()=>[])
     ]);
-    allOrders=oR.data||[]; inventory=iR.data||[]; bookings=bR.data||[]; menuItems=mR||[];
+    allOrders=oR.data||[]; inventory=iR.data||[]; capacityData=cR.data||[]; menuItems=mR||[];
     document.getElementById('upd-time').innerText='Updated: '+now.toLocaleTimeString('en-IN');
     renderStats(); renderToday(); renderPending(); renderConfirmed();
     renderKitchen(); renderPackaging(); renderOFD(); renderFuture(); renderCompleted();
@@ -317,7 +318,8 @@
   /* ── Kitchen strip (Today tab) ── */
   function kitchenStrip(orders) {
     const now=new Date(), cutoff=new Date(now.getTime()+2*3600000);
-    const active=orders.filter(o=>['pending','confirmed','preparing'].includes(o.status)&&new Date(o.scheduled_time)<=cutoff&&new Date(o.scheduled_time)>=now);
+    // Show all active orders today in kitchen strip (not just next 2hrs — show all pending today)
+    const active=orders.filter(o=>['pending','confirmed','preparing'].includes(o.status)&&isToday(o.scheduled_time));
     if(!active.length) return `<div class="kitchen-strip"><div class="ks-header"><span>Kitchen — next 2 hrs</span></div><div style="color:#bbb;font-size:0.82rem;padding:4px 0;">Nothing in next 2 hours</div></div>`;
     const slots={};
     active.forEach(o=>{
@@ -488,7 +490,7 @@
     const html=Object.entries(grouped).map(([pname,items])=>
       items.map(item=>{
         const effectiveCap=item.daily_capacity>0?item.daily_capacity:item.default_capacity;
-        const todayBooked=bookings.filter(b=>b.product_name===item.product_name&&b.variant===item.variant&&b.booking_date===new Date().toISOString().slice(0,10)).reduce((s,b)=>s+parseFloat(b.booked_qty),0);
+        const todayStr2=new Date().toISOString().slice(0,10); const todayBooked=(capacityData||[]).filter(b=>b.product_name===item.product_name&&(b.variant||'')===(item.variant||'')&&b.order_date===todayStr2).reduce((s,b)=>s+parseFloat(b.used_qty||0),0);
         const remaining=Math.max(0,effectiveCap-todayBooked);
         const step=item.unit==='Kg'?0.25:1;
         const isOut=item.stock_qty<=0||!item.in_stock;
