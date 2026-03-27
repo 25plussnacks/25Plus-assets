@@ -7,14 +7,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --accent:#d35400; --dark:#1e272e; --success:#27ae60; --warn:#f39c12;
-      --info:#2980b9; --danger:#e74c3c; --light:#f8f9fa; --border:#eee;
-    }
+    :root { --accent:#d35400; --dark:#1e272e; --success:#27ae60; --warn:#f39c12; --info:#2980b9; --danger:#e74c3c; --border:#eee; }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Plus Jakarta Sans',sans-serif; background:#f1f2f6; color:var(--dark); min-height:100vh; }
+    body { font-family:'Plus Jakarta Sans',sans-serif; background:#f1f2f6; color:var(--dark); }
 
-    /* ── PIN SCREEN ── */
+    /* PIN */
     #pin-screen { position:fixed; inset:0; background:var(--dark); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
     #pin-screen h1 { color:white; font-size:1.5rem; margin-bottom:6px; }
     #pin-screen p  { color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:24px; }
@@ -23,560 +20,618 @@
     #pin-error { color:#e74c3c; font-size:0.8rem; margin-top:8px; height:16px; }
     .pin-btn { background:var(--accent); color:white; border:none; padding:14px 32px; border-radius:12px; font-weight:800; font-size:1rem; cursor:pointer; margin-top:12px; font-family:inherit; width:200px; }
 
-    /* ── HEADER ── */
-    header { background:var(--dark); padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:56px; position:sticky; top:0; z-index:100; }
-    .logo { color:white; font-weight:800; font-size:1rem; }
+    /* HEADER */
+    header { background:var(--dark); padding:0 20px; display:flex; align-items:center; justify-content:space-between; height:52px; position:sticky; top:0; z-index:100; }
+    .logo { color:white; font-weight:800; font-size:0.95rem; }
     .logo span { color:var(--accent); }
-    .header-right { display:flex; align-items:center; gap:16px; }
-    .live-badge { background:#27ae60; color:white; font-size:0.7rem; font-weight:800; padding:3px 8px; border-radius:20px; }
-    .logout-btn { color:rgba(255,255,255,0.5); font-size:0.8rem; cursor:pointer; border:none; background:none; font-family:inherit; }
-    .logout-btn:hover { color:white; }
+    .hdr-right { display:flex; align-items:center; gap:12px; }
+    .live-dot { width:8px; height:8px; background:#27ae60; border-radius:50%; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .logout-btn { color:rgba(255,255,255,0.5); font-size:0.78rem; cursor:pointer; border:none; background:none; font-family:inherit; }
 
-    /* ── TABS ── */
-    .tab-bar { background:white; border-bottom:2px solid var(--border); display:flex; overflow-x:auto; padding:0 16px; gap:4px; position:sticky; top:56px; z-index:99; }
+    /* TABS */
+    .tab-bar { background:white; border-bottom:2px solid var(--border); display:flex; overflow-x:auto; padding:0 12px; position:sticky; top:52px; z-index:99; }
     .tab-bar::-webkit-scrollbar { display:none; }
-    .tab { padding:14px 16px; font-weight:700; font-size:0.82rem; cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; color:#888; transition:0.2s; display:flex; align-items:center; gap:6px; }
+    .tab { padding:12px 14px; font-weight:700; font-size:0.78rem; cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; color:#999; transition:0.2s; display:flex; align-items:center; gap:5px; }
     .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-    .tab-count { background:#eee; color:#666; border-radius:20px; padding:1px 7px; font-size:0.7rem; font-weight:800; }
+    .tab-count { background:#eee; color:#666; border-radius:20px; padding:1px 6px; font-size:0.68rem; font-weight:800; }
     .tab.active .tab-count { background:var(--accent); color:white; }
 
-    /* ── MAIN ── */
-    main { max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
+    /* MAIN */
+    main { max-width:1100px; margin:0 auto; padding:16px 14px 60px; }
 
-    /* ── STAT CARDS ── */
-    .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:20px; }
-    .stat-card { background:white; border-radius:16px; padding:16px; border-left:4px solid; }
-    .stat-card .num { font-size:1.8rem; font-weight:900; }
-    .stat-card .lbl { font-size:0.75rem; color:#888; font-weight:600; margin-top:2px; }
-    .stat-pending  { border-color:var(--warn); }     .stat-pending .num  { color:var(--warn); }
-    .stat-confirmed{ border-color:var(--info); }     .stat-confirmed .num{ color:var(--info); }
-    .stat-prep     { border-color:var(--accent); }   .stat-prep .num     { color:var(--accent); }
-    .stat-delivery { border-color:#8e44ad; }         .stat-delivery .num { color:#8e44ad; }
-    .stat-done     { border-color:var(--success); }  .stat-done .num     { color:var(--success); }
+    /* STATS */
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin-bottom:16px; }
+    .stat-card { background:white; border-radius:14px; padding:14px; border-left:4px solid; }
+    .stat-card .num { font-size:1.6rem; font-weight:900; }
+    .stat-card .lbl { font-size:0.7rem; color:#888; font-weight:600; margin-top:2px; }
+    .s-pending { border-color:var(--warn); }   .s-pending .num { color:var(--warn); }
+    .s-confirmed{ border-color:var(--info); }  .s-confirmed .num { color:var(--info); }
+    .s-ofd { border-color:#8e44ad; }           .s-ofd .num { color:#8e44ad; }
+    .s-done { border-color:var(--success); }   .s-done .num { color:var(--success); }
+    .s-future { border-color:#16a085; }        .s-future .num { color:#16a085; }
 
-    /* ── SECTION ── */
+    /* SECTIONS */
     .section { display:none; }
     .section.active { display:block; }
-    .section-title { font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:#aaa; margin:20px 0 10px; }
+    .sec-title { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:#bbb; margin:16px 0 8px; }
 
-    /* ── ORDER CARD ── */
-    .order-card { background:white; border-radius:16px; padding:20px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid var(--border); }
-    .order-card-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
-    .order-ref-big { font-size:1.1rem; font-weight:900; color:var(--dark); letter-spacing:1px; }
-    .order-meta { font-size:0.78rem; color:#aaa; margin-top:2px; }
-    .order-badges { display:flex; gap:6px; flex-wrap:wrap; }
-    .badge { font-size:0.7rem; font-weight:800; padding:3px 10px; border-radius:20px; }
-    .badge-pending        { background:#fff8e8; color:#b7770d; }
-    .badge-confirmed      { background:#e8f4fd; color:#1a6fa3; }
-    .badge-preparing      { background:#fff0e8; color:#c0392b; }
-    .badge-out_for_delivery { background:#f0e8ff; color:#6c3483; }
-    .badge-delivered      { background:#eafaf1; color:#1e7e34; }
-    .badge-cancelled      { background:#fde8e8; color:#922b21; }
-    .badge-delivery       { background:#e8f4fd; color:#1a6fa3; }
-    .badge-pickup         { background:#eafaf1; color:#1e7e34; }
+    /* MINI KITCHEN STRIP (overview) */
+    .kitchen-strip { background:white; border-radius:14px; padding:14px 16px; margin-bottom:16px; border:1px solid var(--border); }
+    .kitchen-strip-title { font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#aaa; margin-bottom:10px; display:flex; justify-content:space-between; }
+    .kitchen-slots { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
+    .kitchen-slots::-webkit-scrollbar { display:none; }
+    .kslot { background:#f9f9f9; border-radius:10px; padding:10px 14px; min-width:160px; border:1px solid var(--border); flex-shrink:0; }
+    .kslot.urgent { background:#fff8f0; border-color:var(--warn); }
+    .kslot-time { font-size:0.9rem; font-weight:900; color:var(--accent); margin-bottom:6px; }
+    .kslot.urgent .kslot-time { color:var(--warn); }
+    .kslot-item { font-size:0.78rem; color:var(--dark); padding:2px 0; display:flex; justify-content:space-between; gap:8px; }
+    .kslot-item span { font-weight:800; color:var(--accent); }
+    .no-kitchen { font-size:0.82rem; color:#bbb; padding:8px 0; }
 
-    .order-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; font-size:0.82rem; margin-bottom:12px; }
-    .order-detail-grid .lbl { color:#aaa; }
-    .order-detail-grid .val { font-weight:600; color:var(--dark); }
+    /* ORDER CARD */
+    .order-card { background:white; border-radius:14px; padding:18px; margin-bottom:10px; border:1px solid var(--border); }
+    .oc-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; flex-wrap:wrap; gap:6px; }
+    .oc-ref { font-size:1rem; font-weight:900; letter-spacing:1px; }
+    .oc-meta { font-size:0.75rem; color:#aaa; margin-top:2px; }
+    .badges { display:flex; gap:5px; flex-wrap:wrap; }
+    .badge { font-size:0.68rem; font-weight:800; padding:3px 9px; border-radius:20px; }
+    .b-pending         { background:#fff8e8; color:#b7770d; }
+    .b-confirmed       { background:#e8f4fd; color:#1a6fa3; }
+    .b-preparing       { background:#fff0e8; color:#c0392b; }
+    .b-out_for_delivery{ background:#f0e8ff; color:#6c3483; }
+    .b-delivered       { background:#eafaf1; color:#1e7e34; }
+    .b-cancelled       { background:#fde8e8; color:#922b21; }
+    .b-delivery        { background:#e8f4fd; color:#1a6fa3; }
+    .b-pickup          { background:#eafaf1; color:#1e7e34; }
 
-    .items-mini { background:var(--light); border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:0.82rem; }
-    .items-mini .item-line { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #eee; }
-    .items-mini .item-line:last-child { border:none; }
+    .oc-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; font-size:0.8rem; margin-bottom:10px; }
+    .oc-grid .l { color:#aaa; }
+    .oc-grid .v { font-weight:600; }
 
-    /* ── STATUS BUTTONS ── */
-    .status-btns { display:flex; gap:8px; flex-wrap:wrap; }
-    .status-btn { border:none; padding:8px 14px; border-radius:8px; font-weight:700; font-size:0.78rem; cursor:pointer; font-family:inherit; transition:0.2s; }
-    .status-btn:hover { opacity:0.85; transform:translateY(-1px); }
-    .btn-confirm  { background:#e8f4fd; color:#1a6fa3; }
-    .btn-prepare  { background:#fff0e8; color:var(--accent); }
-    .btn-dispatch { background:#f0e8ff; color:#6c3483; }
-    .btn-deliver  { background:#eafaf1; color:var(--success); }
-    .btn-cancel   { background:#fde8e8; color:var(--danger); }
-    .btn-loading  { opacity:0.6; pointer-events:none; }
+    .items-box { background:#f9f9f9; border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:0.8rem; }
+    .items-box .il { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #eee; }
+    .items-box .il:last-child { border:none; }
 
-    /* ── KITCHEN / PACKAGING SCHEDULE ── */
-    .schedule-day { margin-bottom:28px; }
-    .schedule-day-title { font-size:1rem; font-weight:800; color:var(--dark); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--border); }
-    .time-slot { background:white; border-radius:12px; margin-bottom:8px; overflow:hidden; border:1px solid var(--border); }
-    .time-slot-head { padding:10px 16px; display:flex; align-items:center; gap:12px; background:#f9f9f9; border-bottom:1px solid var(--border); }
-    .time-slot-time { font-size:1rem; font-weight:900; color:var(--accent); min-width:70px; }
-    .time-slot-label { font-size:0.78rem; color:#888; font-weight:600; }
-    .time-slot-urgent { background:#fff8e8; }
-    .time-slot-urgent .time-slot-time { color:var(--warn); }
-    .time-slot-body { padding:10px 16px; }
-    .ingredient-line { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f5f5f5; font-size:0.85rem; }
-    .ingredient-line:last-child { border:none; }
-    .ingredient-name { font-weight:700; color:var(--dark); }
-    .ingredient-qty  { font-weight:900; color:var(--accent); font-size:0.95rem; }
-    .ingredient-orders { font-size:0.72rem; color:#aaa; }
-    .no-schedule { text-align:center; padding:40px; color:#aaa; font-size:0.9rem; }
+    /* STATUS BUTTONS */
+    .st-btns { display:flex; gap:6px; flex-wrap:wrap; }
+    .st-btn { border:none; padding:8px 14px; border-radius:8px; font-weight:700; font-size:0.76rem; cursor:pointer; font-family:inherit; transition:0.2s; display:flex; align-items:center; gap:4px; }
+    .st-btn:hover { transform:translateY(-1px); opacity:0.9; }
+    .st-btn:disabled { opacity:0.5; pointer-events:none; }
+    .btn-confirmed        { background:#e8f4fd; color:#1a6fa3; }
+    .btn-preparing        { background:#fff0e8; color:var(--accent); }
+    .btn-out_for_delivery { background:#f0e8ff; color:#6c3483; }
+    .btn-delivered        { background:#eafaf1; color:var(--success); }
+    .btn-cancelled        { background:#fde8e8; color:var(--danger); }
 
-    /* ── INVENTORY ── */
-    .inventory-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-    .inv-card { background:white; border-radius:14px; padding:16px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border); }
-    .inv-name { font-weight:700; font-size:0.9rem; }
-    .inv-status { font-size:0.72rem; color:#aaa; margin-top:2px; }
-    .toggle-wrap { display:flex; align-items:center; gap:8px; }
-    .toggle-label { font-size:0.75rem; font-weight:800; }
-    .toggle-label.in  { color:var(--success); }
-    .toggle-label.out { color:var(--danger); }
-    .toggle { position:relative; width:42px; height:24px; }
+    /* SCHEDULE */
+    .sched-day { margin-bottom:24px; }
+    .sched-day-title { font-weight:800; font-size:0.95rem; margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--border); }
+    .time-block { background:white; border-radius:12px; margin-bottom:8px; overflow:hidden; border:1px solid var(--border); }
+    .tb-head { padding:10px 14px; background:#f9f9f9; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .tb-head.urgent { background:#fff8f0; }
+    .tb-time { font-size:0.95rem; font-weight:900; color:var(--accent); min-width:65px; }
+    .tb-head.urgent .tb-time { color:var(--warn); }
+    .tb-desc { font-size:0.76rem; color:#888; font-weight:600; }
+    .tb-body { padding:10px 14px; }
+    .ing-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5; font-size:0.82rem; }
+    .ing-row:last-child { border:none; }
+    .ing-name { font-weight:700; }
+    .ing-qty  { font-weight:900; color:var(--accent); font-size:0.9rem; }
+    .ing-for  { font-size:0.7rem; color:#bbb; }
+
+    /* INVENTORY */
+    .inv-toolbar { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+    .inv-toolbar input { padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-family:inherit; font-size:0.85rem; flex:1; min-width:200px; outline:none; }
+    .inv-toolbar input:focus { border-color:var(--accent); }
+    .btn-add-product { background:var(--accent); color:white; border:none; padding:10px 16px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .inv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+    .inv-card { background:white; border-radius:12px; padding:14px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border); }
+    .inv-card.out { border-color:#fde8e8; background:#fffafa; }
+    .inv-name { font-weight:700; font-size:0.88rem; }
+    .inv-qty  { font-size:0.75rem; color:#aaa; margin-top:2px; }
+    .inv-right { display:flex; align-items:center; gap:8px; }
+    .qty-input { width:70px; padding:5px 8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:0.82rem; font-weight:700; text-align:center; outline:none; }
+    .qty-input:focus { border-color:var(--accent); }
+    .toggle { position:relative; width:38px; height:22px; }
     .toggle input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; inset:0; background:#ddd; border-radius:24px; cursor:pointer; transition:0.3s; }
-    .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:white; border-radius:50%; transition:0.3s; }
-    .toggle input:checked + .toggle-slider { background:var(--success); }
-    .toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
+    .toggle-s { position:absolute; inset:0; background:#ddd; border-radius:22px; cursor:pointer; transition:0.3s; }
+    .toggle-s:before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:0.3s; }
+    .toggle input:checked + .toggle-s { background:var(--success); }
+    .toggle input:checked + .toggle-s:before { transform:translateX(16px); }
 
-    /* ── EMPTY STATE ── */
-    .empty { text-align:center; padding:50px 20px; color:#bbb; }
-    .empty i { font-size:2.5rem; margin-bottom:12px; display:block; }
-    .empty p { font-size:0.9rem; }
+    /* COUNTDOWN */
+    .cd { font-size:0.7rem; font-weight:800; padding:2px 7px; border-radius:10px; margin-left:6px; }
+    .cd-ok     { background:#eafaf1; color:var(--success); }
+    .cd-urgent { background:#fff0e8; color:var(--accent); }
+    .cd-late   { background:#fde8e8; color:var(--danger); }
 
-    /* ── REFRESH ── */
-    .refresh-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-    .refresh-btn { background:white; border:1px solid var(--border); color:var(--dark); padding:8px 16px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; }
-    .refresh-btn:hover { background:#f5f5f5; }
-    .last-updated { font-size:0.75rem; color:#aaa; }
+    /* EMPTY */
+    .empty { text-align:center; padding:40px; color:#ccc; }
+    .empty i { font-size:2rem; margin-bottom:10px; display:block; }
 
-    /* ── COUNTDOWN ── */
-    .countdown { font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:10px; }
-    .countdown.urgent { background:#fff0e8; color:var(--accent); }
-    .countdown.ok     { background:#eafaf1; color:var(--success); }
-    .countdown.late   { background:#fde8e8; color:var(--danger); }
+    /* REFRESH */
+    .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .refresh-btn { background:white; border:1px solid var(--border); color:var(--dark); padding:7px 14px; border-radius:8px; font-weight:700; font-size:0.76rem; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:5px; }
+    .upd-time { font-size:0.72rem; color:#bbb; }
 
-    @media (max-width:600px) {
-      .order-detail-grid { grid-template-columns:1fr; }
+    @media(max-width:600px){
+      .oc-grid { grid-template-columns:1fr; }
       .stats-row { grid-template-columns:1fr 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- PIN SCREEN -->
+<!-- PIN -->
 <div id="pin-screen">
   <h1>🔐 Owner Console</h1>
   <p>25 Plus Snacks — Admin Access</p>
-  <input type="password" id="pin-input" placeholder="••••" maxlength="6" inputmode="numeric"
-    onkeydown="if(event.key==='Enter') checkPin()">
+  <input type="password" id="pin-input" placeholder="••••" maxlength="6" inputmode="numeric" onkeydown="if(event.key==='Enter')checkPin()">
   <div id="pin-error"></div>
   <button class="pin-btn" onclick="checkPin()">Enter</button>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="app" style="display:none;">
   <header>
-    <div class="logo"><span>25</span> Plus Snacks — Owner Console</div>
-    <div class="header-right">
-      <span class="live-badge">● LIVE</span>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+    <div class="logo"><span>25</span> Plus Snacks Console</div>
+    <div class="hdr-right">
+      <div class="live-dot"></div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </header>
 
   <div class="tab-bar">
-    <div class="tab active" onclick="switchTab('today')" id="tab-today">
-      <i class="fas fa-calendar-day"></i> Today
-      <span class="tab-count" id="cnt-today">0</span>
-    </div>
-    <div class="tab" onclick="switchTab('pending')" id="tab-pending">
-      <i class="fas fa-clock"></i> Pending
-      <span class="tab-count" id="cnt-pending">0</span>
-    </div>
-    <div class="tab" onclick="switchTab('confirmed')" id="tab-confirmed">
-      <i class="fas fa-check-circle"></i> Confirmed
-      <span class="tab-count" id="cnt-confirmed">0</span>
-    </div>
-    <div class="tab" onclick="switchTab('kitchen')" id="tab-kitchen">
-      <i class="fas fa-utensils"></i> Kitchen Schedule
-    </div>
-    <div class="tab" onclick="switchTab('packaging')" id="tab-packaging">
-      <i class="fas fa-box"></i> Packaging
-    </div>
-    <div class="tab" onclick="switchTab('outfordelivery')" id="tab-outfordelivery">
-      <i class="fas fa-truck"></i> Out for Delivery
-      <span class="tab-count" id="cnt-ofd">0</span>
-    </div>
-    <div class="tab" onclick="switchTab('completed')" id="tab-completed">
-      <i class="fas fa-check-double"></i> Completed
-      <span class="tab-count" id="cnt-done">0</span>
-    </div>
-    <div class="tab" onclick="switchTab('inventory')" id="tab-inventory">
-      <i class="fas fa-boxes"></i> Inventory
-    </div>
+    <div class="tab active" onclick="switchTab('today')"        id="tab-today">        <i class="fas fa-calendar-day"></i> Today         <span class="tab-count" id="cnt-today">0</span></div>
+    <div class="tab"        onclick="switchTab('pending')"      id="tab-pending">      <i class="fas fa-clock"></i> Pending           <span class="tab-count" id="cnt-pending">0</span></div>
+    <div class="tab"        onclick="switchTab('confirmed')"    id="tab-confirmed">    <i class="fas fa-check-circle"></i> Confirmed     <span class="tab-count" id="cnt-confirmed">0</span></div>
+    <div class="tab"        onclick="switchTab('kitchen')"      id="tab-kitchen">      <i class="fas fa-utensils"></i> Kitchen</div>
+    <div class="tab"        onclick="switchTab('packaging')"    id="tab-packaging">    <i class="fas fa-box"></i> Packaging</div>
+    <div class="tab"        onclick="switchTab('ofd')"          id="tab-ofd">          <i class="fas fa-truck"></i> Out for Delivery  <span class="tab-count" id="cnt-ofd">0</span></div>
+    <div class="tab"        onclick="switchTab('future')"       id="tab-future">       <i class="fas fa-calendar-alt"></i> Future Orders <span class="tab-count" id="cnt-future">0</span></div>
+    <div class="tab"        onclick="switchTab('completed')"    id="tab-completed">    <i class="fas fa-check-double"></i> Completed     <span class="tab-count" id="cnt-done">0</span></div>
+    <div class="tab"        onclick="switchTab('inventory')"    id="tab-inventory">    <i class="fas fa-boxes"></i> Inventory</div>
   </div>
 
   <main>
-    <div class="refresh-bar">
+    <div class="top-bar">
       <div class="stats-row" id="stats-row" style="flex:1;margin-bottom:0;"></div>
-      <button class="refresh-btn" onclick="loadAll()" style="margin-left:12px;">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
+      <button class="refresh-btn" onclick="loadAll()" style="margin-left:10px;"><i class="fas fa-sync-alt"></i> Refresh</button>
     </div>
-    <div class="last-updated" id="last-updated"></div>
+    <div class="upd-time" id="upd-time" style="margin-bottom:12px;"></div>
 
-    <!-- TODAY -->
     <div class="section active" id="section-today"></div>
-
-    <!-- PENDING -->
-    <div class="section" id="section-pending"></div>
-
-    <!-- CONFIRMED -->
-    <div class="section" id="section-confirmed"></div>
-
-    <!-- KITCHEN SCHEDULE -->
-    <div class="section" id="section-kitchen"></div>
-
-    <!-- PACKAGING -->
-    <div class="section" id="section-packaging"></div>
-
-    <!-- OUT FOR DELIVERY -->
-    <div class="section" id="section-outfordelivery"></div>
-
-    <!-- COMPLETED -->
-    <div class="section" id="section-completed"></div>
-
-    <!-- INVENTORY -->
-    <div class="section" id="section-inventory"></div>
+    <div class="section"        id="section-pending"></div>
+    <div class="section"        id="section-confirmed"></div>
+    <div class="section"        id="section-kitchen"></div>
+    <div class="section"        id="section-packaging"></div>
+    <div class="section"        id="section-ofd"></div>
+    <div class="section"        id="section-future"></div>
+    <div class="section"        id="section-completed"></div>
+    <div class="section"        id="section-inventory"></div>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-  /* ── Config ─────────────────────────────────────── */
-  const CONSOLE_PIN   = '7890';   // ← Change this to your preferred PIN
-  const SUPABASE_URL  = 'https://qkemufgipqtqqsmzzjlb.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZW11ZmdpcHF0cXFzbXp6amxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDkzNjYsImV4cCI6MjA4OTk4NTM2Nn0.fNclTYljlN2qze9_wMuzDPh68l0Ve15OkNY7Zl6aFPs';
-  const EDGE_FN_URL   = `${SUPABASE_URL}/functions/v1/send-order-email`;
-  const GITHUB_MENU   = 'https://raw.githubusercontent.com/25plussnacks/25Plus-assets/main/menu.json';
-  const PACK_MINS     = 20;   // packaging + buffer time before delivery
+  /* ── Config ─────────────────────────────── */
+  const PIN          = '2526';   // ← change your PIN here
+  const SUPA_URL     = 'https://qkemufgipqtqqsmzzjlb.supabase.co';
+  const SUPA_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrZW11ZmdpcHF0cXFzbXp6amxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDkzNjYsImV4cCI6MjA4OTk4NTM2Nn0.fNclTYljlN2qze9_wMuzDPh68l0Ve15OkNY7Zl6aFPs';
+  const EDGE_URL     = `${SUPA_URL}/functions/v1/send-order-email`;
+  const MENU_URL     = 'https://raw.githubusercontent.com/25plussnacks/25Plus-assets/main/menu.json';
+  const PACK_MINS    = 20;  // packaging + buffer before delivery
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  const sb = supabase.createClient(SUPA_URL, SUPA_ANON);
 
-  let allOrders  = [];
-  let inventory  = [];
-  let menuItems  = [];
-  let activeTab  = 'today';
+  let allOrders = [], inventory = [], menuItems = [], activeTab = 'today';
 
-  /* ── PIN ─────────────────────────────────────────── */
+  /* ── Valid status values (must match DB check constraint exactly) ── */
+  const VALID_STATUSES = ['pending','confirmed','preparing','out_for_delivery','delivered','cancelled'];
+
+  /* ── PIN ─────────────────────────────────── */
   function checkPin() {
-    const val = document.getElementById('pin-input').value.trim();
-    if (val === CONSOLE_PIN) {
-      sessionStorage.setItem('console_auth', '1');
+    if (document.getElementById('pin-input').value.trim() === PIN) {
+      sessionStorage.setItem('ca','1');
       document.getElementById('pin-screen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
-      loadAll();
-      setInterval(loadAll, 60000); // auto-refresh every 60s
+      loadAll(); setInterval(loadAll, 60000);
     } else {
-      document.getElementById('pin-error').innerText = 'Wrong PIN. Try again.';
+      document.getElementById('pin-error').innerText = 'Wrong PIN.';
       document.getElementById('pin-input').value = '';
     }
   }
-  function logout() {
-    sessionStorage.removeItem('console_auth');
-    location.reload();
-  }
-  if (sessionStorage.getItem('console_auth') === '1') {
+  function logout() { sessionStorage.removeItem('ca'); location.reload(); }
+  if (sessionStorage.getItem('ca') === '1') {
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    loadAll();
-    setInterval(loadAll, 60000);
+    loadAll(); setInterval(loadAll, 60000);
   }
 
-  /* ── Tab switching ───────────────────────────────── */
-  function switchTab(tab) {
-    activeTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(`tab-${tab}`).classList.add('active');
-    document.getElementById(`section-${tab}`).classList.add('active');
+  /* ── Tabs ────────────────────────────────── */
+  function switchTab(t) {
+    activeTab = t;
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.getElementById(`tab-${t}`).classList.add('active');
+    document.getElementById(`section-${t}`).classList.add('active');
   }
 
-  /* ── Load everything ─────────────────────────────── */
+  /* ── Load ────────────────────────────────── */
   async function loadAll() {
-    const now = new Date();
-    const todayStart = new Date(now); todayStart.setHours(0,0,0,0);
-    const next7      = new Date(now); next7.setDate(now.getDate() + 7);
+    const now   = new Date();
+    const start = new Date(now); start.setDate(start.getDate() - 1); start.setHours(0,0,0,0);
 
-    const [ordersRes, invRes, menuRes] = await Promise.all([
-      sb.from('orders').select('*, order_items(*)').gte('scheduled_time', todayStart.toISOString()).lte('scheduled_time', next7.toISOString()).order('scheduled_time', { ascending: true }),
-      sb.from('inventory').select('*'),
-      fetch(GITHUB_MENU + '?v=' + Date.now()).then(r => r.json()).catch(() => [])
+    const [oRes, iRes, mRes] = await Promise.all([
+      sb.from('orders').select('*, order_items(*)').gte('scheduled_time', start.toISOString()).order('scheduled_time', { ascending: true }),
+      sb.from('inventory').select('*').order('product_name'),
+      fetch(MENU_URL + '?v=' + Date.now()).then(r => r.json()).catch(() => [])
     ]);
 
-    allOrders = ordersRes.data || [];
-    inventory = invRes.data   || [];
-    menuItems = menuRes       || [];
+    allOrders = oRes.data  || [];
+    inventory = iRes.data  || [];
+    menuItems = mRes       || [];
 
-    document.getElementById('last-updated').innerText = 'Last updated: ' + now.toLocaleTimeString('en-IN');
+    document.getElementById('upd-time').innerText = 'Updated: ' + now.toLocaleTimeString('en-IN');
 
     renderStats();
     renderToday();
-    renderSection('pending',        allOrders.filter(o => o.status === 'pending'));
-    renderSection('confirmed',      allOrders.filter(o => o.status === 'confirmed' || o.status === 'preparing'));
-    renderSection('outfordelivery', allOrders.filter(o => o.status === 'out_for_delivery'));
-    renderSection('completed',      allOrders.filter(o => o.status === 'delivered' || o.status === 'cancelled'));
-    renderKitchenSchedule();
-    renderPackagingSchedule();
+    renderPending();
+    renderConfirmed();
+    renderKitchen();
+    renderPackaging();
+    renderOFD();
+    renderFuture();
+    renderCompleted();
     renderInventory();
   }
 
-  /* ── Stats ───────────────────────────────────────── */
-  function renderStats() {
-    const pending  = allOrders.filter(o => o.status === 'pending').length;
-    const confirmed= allOrders.filter(o => o.status === 'confirmed' || o.status === 'preparing').length;
-    const ofd      = allOrders.filter(o => o.status === 'out_for_delivery').length;
-    const done     = allOrders.filter(o => o.status === 'delivered').length;
+  /* ── Helpers ─────────────────────────────── */
+  const isToday    = dt => { const d = new Date(dt), n = new Date(); return d.toDateString() === n.toDateString(); };
+  const isTomorrow = dt => { const d = new Date(dt), t = new Date(); t.setDate(t.getDate()+1); return d.toDateString() === t.toDateString(); };
+  const isAfterTomorrow = dt => !isToday(dt) && !isTomorrow(dt) && new Date(dt) > new Date();
+  const fmtTime = dt => new Date(dt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
+  const fmtDate = dt => new Date(dt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
+  const fmtDT   = dt => new Date(dt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
 
-    const todayOrders = allOrders.filter(o => isToday(o.scheduled_time));
-
-    document.getElementById('cnt-today').innerText     = todayOrders.length;
-    document.getElementById('cnt-pending').innerText   = pending;
-    document.getElementById('cnt-confirmed').innerText = confirmed;
-    document.getElementById('cnt-ofd').innerText       = ofd;
-    document.getElementById('cnt-done').innerText      = done;
-
-    document.getElementById('stats-row').innerHTML = `
-      <div class="stat-card stat-pending"><div class="num">${pending}</div><div class="lbl">Pending</div></div>
-      <div class="stat-card stat-confirmed"><div class="num">${confirmed}</div><div class="lbl">Confirmed</div></div>
-      <div class="stat-card stat-delivery"><div class="num">${ofd}</div><div class="lbl">Out for Delivery</div></div>
-      <div class="stat-card stat-done"><div class="num">${done}</div><div class="lbl">Delivered Today</div></div>`;
+  function cdHtml(dt) {
+    const diff = new Date(dt) - new Date();
+    if (diff < 0) return `<span class="cd cd-late">OVERDUE</span>`;
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000);
+    const txt = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    return `<span class="cd ${diff < 3600000 ? 'cd-urgent':'cd-ok'}">${txt}</span>`;
   }
 
-  /* ── Helpers ─────────────────────────────────────── */
-  function isToday(dt) {
-    const d = new Date(dt), now = new Date();
-    return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }
-  function isTomorrow(dt) {
-    const d = new Date(dt), tom = new Date(); tom.setDate(tom.getDate()+1);
-    return d.getDate() === tom.getDate() && d.getMonth() === tom.getMonth() && d.getFullYear() === tom.getFullYear();
-  }
-  function fmtTime(dt) {
-    return new Date(dt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true, timeZone:'Asia/Kolkata' });
-  }
-  function fmtDateTime(dt) {
-    return new Date(dt).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', hour12:true, timeZone:'Asia/Kolkata' });
-  }
-  function countdown(scheduledTime) {
-    const diff = new Date(scheduledTime) - new Date();
-    if (diff < 0) return `<span class="countdown late">OVERDUE</span>`;
-    const hrs  = Math.floor(diff / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    const txt  = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
-    const cls  = diff < 3600000 ? 'urgent' : 'ok';
-    return `<span class="countdown ${cls}">${txt} left</span>`;
-  }
-  function statusBadge(status) {
-    const labels = { pending:'Pending', confirmed:'Confirmed', preparing:'Preparing', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' };
-    return `<span class="badge badge-${status}">${labels[status] || status}</span>`;
+  function statusBadge(s) {
+    const L = {pending:'Pending',confirmed:'Confirmed',preparing:'Preparing',out_for_delivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'};
+    return `<span class="badge b-${s}">${L[s]||s}</span>`;
   }
 
-  /* ── Order card ──────────────────────────────────── */
-  function orderCard(order) {
-    const items = order.order_items || [];
+  /* ── Status transition map ───────────────────
+     Keys and values MUST match DB check constraint exactly:
+     pending | confirmed | preparing | out_for_delivery | delivered | cancelled
+  ──────────────────────────────────────────── */
+  const TRANSITIONS = {
+    pending:          ['confirmed','cancelled'],
+    confirmed:        ['preparing','cancelled'],
+    preparing:        ['out_for_delivery','delivered'],
+    out_for_delivery: ['delivered'],
+    delivered:        [],
+    cancelled:        []
+  };
+
+  const STATUS_LABELS = {
+    confirmed:        '✅ Confirm',
+    preparing:        '👨‍🍳 Preparing',
+    out_for_delivery: '🚚 Out for Delivery',
+    delivered:        '✅ Delivered',
+    cancelled:        '❌ Cancel'
+  };
+
+  const STATUS_BTN_CLASS = {
+    confirmed:        'btn-confirmed',
+    preparing:        'btn-preparing',
+    out_for_delivery: 'btn-out_for_delivery',
+    delivered:        'btn-delivered',
+    cancelled:        'btn-cancelled'
+  };
+
+  /* ── Order card ──────────────────────────── */
+  function orderCard(o) {
+    const items = o.order_items || [];
+    const packTime = new Date(new Date(o.scheduled_time) - PACK_MINS * 60000);
+    const isDelivery = o.order_type === 'delivery';
+
     const itemsHtml = items.map(i =>
-      `<div class="item-line">
-        <span>${i.product_name}${i.variant ? ' ('+i.variant+')' : ''}</span>
-        <span style="font-weight:800;">${i.qty_per_packet} ${i.unit} × ${i.packets} pkt = <span style="color:var(--accent)">₹${i.line_total}</span></span>
-      </div>`
+      `<div class="il">
+        <span>${i.product_name}${i.variant?' ('+i.variant+')':''}</span>
+        <span style="font-weight:700;">${i.qty_per_packet}${i.unit} × ${i.packets}pkt = <b style="color:var(--accent)">₹${i.line_total}</b></span>
+      </div>`).join('');
+
+    const transitions = TRANSITIONS[o.status] || [];
+    const btnHtml = transitions.map(ns =>
+      `<button class="st-btn ${STATUS_BTN_CLASS[ns]}" onclick="updateStatus('${o.id}','${ns}',this)">
+        ${STATUS_LABELS[ns]}
+      </button>`
     ).join('');
 
-    const isDelivery = order.order_type === 'delivery';
-    const packDeadline = new Date(new Date(order.scheduled_time) - PACK_MINS * 60000);
-
-    const nextStatuses = {
-      pending:          [['btn-confirm','confirm','✅ Confirm'],['btn-cancel','cancel','❌ Cancel']],
-      confirmed:        [['btn-prepare','preparing','👨‍🍳 Mark Preparing'],['btn-cancel','cancel','❌ Cancel']],
-      preparing:        [['btn-dispatch','out_for_delivery','🚚 Out for Delivery'],['btn-deliver','delivered','✅ Mark Delivered']],
-      out_for_delivery: [['btn-deliver','delivered','✅ Mark Delivered']],
-      delivered:        [],
-      cancelled:        []
-    };
-
-    const btnHtml = (nextStatuses[order.status] || []).map(([cls, st, lbl]) =>
-      `<button class="status-btn ${cls}" onclick="updateStatus('${order.id}','${st}',this)">${lbl}</button>`
-    ).join('');
-
-    return `<div class="order-card" id="card-${order.id}">
-      <div class="order-card-head">
+    return `<div class="order-card" id="card-${o.id}">
+      <div class="oc-head">
         <div>
-          <div class="order-ref-big">${order.order_ref || order.id.slice(0,8).toUpperCase()}</div>
-          <div class="order-meta">${fmtDateTime(order.scheduled_time)} ${countdown(order.scheduled_time)}</div>
+          <div class="oc-ref">${o.order_ref || o.id.slice(0,8).toUpperCase()}</div>
+          <div class="oc-meta">${fmtDT(o.scheduled_time)} ${cdHtml(o.scheduled_time)}</div>
         </div>
-        <div class="order-badges">
-          ${statusBadge(order.status)}
-          <span class="badge badge-${order.order_type}">${isDelivery ? '🚚 Delivery' : '🏪 Pickup'}</span>
+        <div class="badges">
+          ${statusBadge(o.status)}
+          <span class="badge b-${o.order_type}">${isDelivery?'🚚 Delivery':'🏪 Pickup'}</span>
         </div>
       </div>
-      <div class="order-detail-grid">
-        <div><div class="lbl">Customer</div><div class="val">${order.customer_name}</div></div>
-        <div><div class="lbl">Phone</div><div class="val"><a href="tel:${order.customer_phone}" style="color:var(--accent);">${order.customer_phone}</a></div></div>
-        ${isDelivery ? `<div><div class="lbl">Address</div><div class="val">${order.customer_address}${order.pincode ? ' – '+order.pincode : ''}</div></div>` : '<div><div class="lbl">Type</div><div class="val">Store Pickup</div></div>'}
-        <div><div class="lbl">Total</div><div class="val" style="color:var(--accent);font-size:1rem;">₹${order.total_amount}</div></div>
-        <div><div class="lbl">Pack by</div><div class="val" style="color:var(--warn);">${fmtTime(packDeadline)}</div></div>
-        ${order.distance_km ? `<div><div class="lbl">Distance</div><div class="val">${order.distance_km} km</div></div>` : ''}
+      <div class="oc-grid">
+        <div><div class="l">Customer</div><div class="v">${o.customer_name}</div></div>
+        <div><div class="l">Phone</div><div class="v"><a href="tel:${o.customer_phone}" style="color:var(--accent);">${o.customer_phone}</a></div></div>
+        ${isDelivery
+          ? `<div><div class="l">Address</div><div class="v">${o.customer_address}${o.pincode?' ('+o.pincode+')':''}</div></div>`
+          : `<div><div class="l">Type</div><div class="v">Store Pickup</div></div>`}
+        <div><div class="l">Total</div><div class="v" style="color:var(--accent);font-size:0.95rem;">₹${o.total_amount}</div></div>
+        <div><div class="l">Pack by</div><div class="v" style="color:var(--warn);">${fmtTime(packTime)}</div></div>
+        ${o.distance_km ? `<div><div class="l">Distance</div><div class="v">${o.distance_km} km</div></div>` : ''}
       </div>
-      <div class="items-mini">${itemsHtml}</div>
-      <div class="status-btns">${btnHtml}</div>
+      <div class="items-box">${itemsHtml || '<span style="color:#bbb">No items</span>'}</div>
+      <div class="st-btns">${btnHtml || '<span style="font-size:0.78rem;color:#bbb;">No further actions</span>'}</div>
     </div>`;
   }
 
-  /* ── Render today ────────────────────────────────── */
+  /* ── Mini kitchen strip for Today tab ───── */
+  function kitchenStrip(orders) {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + 2 * 3600000); // next 2 hours
+    const active = orders.filter(o =>
+      ['pending','confirmed','preparing'].includes(o.status) &&
+      new Date(o.scheduled_time) <= cutoff &&
+      new Date(o.scheduled_time) >= now
+    );
+    if (!active.length) return `<div class="kitchen-strip"><div class="kitchen-strip-title"><span>Kitchen — next 2 hrs</span></div><div class="no-kitchen">Nothing in next 2 hours</div></div>`;
+
+    // Group by 30-min slot
+    const slots = {};
+    active.forEach(o => {
+      const pack = new Date(new Date(o.scheduled_time) - PACK_MINS * 60000);
+      const m = pack.getMinutes() < 30 ? 0 : 30;
+      pack.setMinutes(m, 0, 0);
+      const k = pack.toISOString();
+      if (!slots[k]) slots[k] = { time: pack, items: {} };
+      (o.order_items || []).forEach(i => {
+        const key = `${i.product_name}${i.variant?'('+i.variant+')':''}`;
+        if (!slots[k].items[key]) slots[k].items[key] = { name: i.product_name, variant: i.variant, unit: i.unit, qty: 0 };
+        slots[k].items[key].qty += i.qty_per_packet * i.packets;
+      });
+    });
+
+    const slotHtml = Object.keys(slots).sort().map(k => {
+      const s = slots[k];
+      const diff = s.time - now;
+      const urgent = diff < 3600000 && diff >= 0;
+      const itemsHtml = Object.values(s.items).map(it =>
+        `<div class="kslot-item">${it.name}${it.variant?' ('+it.variant+')':''} <span>${it.qty%1===0?it.qty:it.qty.toFixed(2)} ${it.unit}</span></div>`
+      ).join('');
+      return `<div class="kslot ${urgent?'urgent':''}"><div class="kslot-time">${fmtTime(s.time)}</div>${itemsHtml}</div>`;
+    }).join('');
+
+    return `<div class="kitchen-strip">
+      <div class="kitchen-strip-title"><span>Kitchen — next 2 hrs (pack deadlines)</span><span style="font-weight:400;color:#bbb;">${active.length} order${active.length>1?'s':''}</span></div>
+      <div class="kitchen-slots">${slotHtml}</div>
+    </div>`;
+  }
+
+  /* ── Render sections ─────────────────────── */
+  function renderStats() {
+    const n = allOrders;
+    const pending   = n.filter(o => o.status==='pending').length;
+    const confirmed = n.filter(o => ['confirmed','preparing'].includes(o.status)).length;
+    const ofd       = n.filter(o => o.status==='out_for_delivery').length;
+    const done      = n.filter(o => o.status==='delivered' && isToday(o.scheduled_time)).length;
+    const future    = n.filter(o => isAfterTomorrow(o.scheduled_time) && !['delivered','cancelled'].includes(o.status)).length;
+
+    document.getElementById('cnt-today').innerText    = n.filter(o => isToday(o.scheduled_time) && !['delivered','cancelled'].includes(o.status)).length;
+    document.getElementById('cnt-pending').innerText  = pending;
+    document.getElementById('cnt-confirmed').innerText= confirmed;
+    document.getElementById('cnt-ofd').innerText      = ofd;
+    document.getElementById('cnt-future').innerText   = future;
+    document.getElementById('cnt-done').innerText     = n.filter(o => ['delivered','cancelled'].includes(o.status) && isToday(o.scheduled_time)).length;
+
+    document.getElementById('stats-row').innerHTML = `
+      <div class="stat-card s-pending"><div class="num">${pending}</div><div class="lbl">Pending</div></div>
+      <div class="stat-card s-confirmed"><div class="num">${confirmed}</div><div class="lbl">Confirmed</div></div>
+      <div class="stat-card s-ofd"><div class="num">${ofd}</div><div class="lbl">Out for Delivery</div></div>
+      <div class="stat-card s-future"><div class="num">${future}</div><div class="lbl">Future Orders</div></div>
+      <div class="stat-card s-done"><div class="num">${done}</div><div class="lbl">Done Today</div></div>`;
+  }
+
+  /* FIX 4: Today only shows PENDING orders (not delivered/cancelled) sorted by delivery time */
   function renderToday() {
-    const todayOrders = allOrders.filter(o => isToday(o.scheduled_time) && o.status !== 'cancelled');
     const el = document.getElementById('section-today');
-    if (!todayOrders.length) {
-      el.innerHTML = `<div class="empty"><i class="fas fa-calendar-check"></i><p>No orders for today</p></div>`;
-      return;
-    }
-    el.innerHTML = `<div class="section-title">Today's Orders — sorted by delivery time</div>` +
-      todayOrders.map(o => orderCard(o)).join('');
+    const todayActive = allOrders.filter(o =>
+      isToday(o.scheduled_time) &&
+      !['delivered','cancelled'].includes(o.status)
+    );
+    const todayAll = allOrders.filter(o => isToday(o.scheduled_time));
+    el.innerHTML = kitchenStrip(todayAll) +
+      (todayActive.length
+        ? `<div class="sec-title">Today's pending orders — sorted by delivery time</div>` + todayActive.map(orderCard).join('')
+        : `<div class="empty"><i class="fas fa-check-circle"></i><p>All done for today!</p></div>`);
   }
 
-  /* ── Render generic section ──────────────────────── */
-  function renderSection(id, orders) {
-    const el = document.getElementById(`section-${id}`);
-    if (!orders.length) {
-      el.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i><p>No orders here</p></div>`;
-      return;
-    }
-    el.innerHTML = orders.map(o => orderCard(o)).join('');
+  function renderPending() {
+    const el = document.getElementById('section-pending');
+    const orders = allOrders.filter(o => o.status === 'pending');
+    el.innerHTML = orders.length ? orders.map(orderCard).join('') : `<div class="empty"><i class="fas fa-inbox"></i><p>No pending orders</p></div>`;
   }
 
-  /* ── Kitchen Schedule ────────────────────────────── */
-  function renderKitchenSchedule() {
+  function renderConfirmed() {
+    const el = document.getElementById('section-confirmed');
+    const orders = allOrders.filter(o => ['confirmed','preparing'].includes(o.status));
+    el.innerHTML = orders.length ? orders.map(orderCard).join('') : `<div class="empty"><i class="fas fa-inbox"></i><p>No confirmed orders</p></div>`;
+  }
+
+  function renderOFD() {
+    const el = document.getElementById('section-ofd');
+    const orders = allOrders.filter(o => o.status === 'out_for_delivery');
+    el.innerHTML = orders.length ? orders.map(orderCard).join('') : `<div class="empty"><i class="fas fa-truck"></i><p>No orders out for delivery</p></div>`;
+  }
+
+  /* FIX 4: Completed shows delivered + cancelled (not overdue) */
+  function renderCompleted() {
+    const el = document.getElementById('section-completed');
+    const orders = allOrders.filter(o => ['delivered','cancelled'].includes(o.status));
+    if (!orders.length) { el.innerHTML = `<div class="empty"><i class="fas fa-check-double"></i><p>No completed orders</p></div>`; return; }
+    const today = orders.filter(o => isToday(o.scheduled_time));
+    const older = orders.filter(o => !isToday(o.scheduled_time));
+    el.innerHTML =
+      (today.length ? `<div class="sec-title">Today</div>` + today.map(orderCard).join('') : '') +
+      (older.length ? `<div class="sec-title">Earlier</div>` + older.map(orderCard).join('') : '');
+  }
+
+  /* FIX 5: Future orders tab */
+  function renderFuture() {
+    const el = document.getElementById('section-future');
+    const orders = allOrders.filter(o =>
+      !isToday(o.scheduled_time) &&
+      new Date(o.scheduled_time) > new Date() &&
+      !['delivered','cancelled'].includes(o.status)
+    );
+    if (!orders.length) { el.innerHTML = `<div class="empty"><i class="fas fa-calendar-alt"></i><p>No future orders</p></div>`; return; }
+
+    const tom    = orders.filter(o => isTomorrow(o.scheduled_time));
+    const later  = orders.filter(o => isAfterTomorrow(o.scheduled_time));
+
+    el.innerHTML =
+      (tom.length   ? `<div class="sec-title">Tomorrow</div>`  + tom.map(orderCard).join('')  : '') +
+      (later.length ? `<div class="sec-title">After Tomorrow</div>` + later.map(orderCard).join('') : '');
+  }
+
+  /* ── Kitchen schedule ────────────────────── */
+  function buildSlots(orders) {
+    const slots = {};
+    orders.forEach(o => {
+      const pack = new Date(new Date(o.scheduled_time) - PACK_MINS * 60000);
+      const m = pack.getMinutes() < 30 ? 0 : 30;
+      pack.setMinutes(m, 0, 0);
+      const k = pack.toISOString();
+      if (!slots[k]) slots[k] = { time: pack, items: {}, orderRefs: [] };
+      slots[k].orderRefs.push(o.order_ref || o.id.slice(0,8));
+      (o.order_items || []).forEach(i => {
+        const key = `${i.product_name}||${i.variant||''}||${i.unit}`;
+        if (!slots[k].items[key]) slots[k].items[key] = { name: i.product_name, variant: i.variant, unit: i.unit, qty: 0 };
+        slots[k].items[key].qty += i.qty_per_packet * i.packets;
+      });
+    });
+    return slots;
+  }
+
+  function renderSlotBlock(slots, keys) {
+    if (!keys.length) return '';
+    const now = new Date();
+    return keys.map(k => {
+      const s = slots[k];
+      const diff = s.time - now;
+      const urgent = diff < 7200000 && diff >= 0;
+      const past   = diff < 0;
+      const itemsHtml = Object.values(s.items).map(i =>
+        `<div class="ing-row">
+          <div><div class="ing-name">${i.name}${i.variant?' ('+i.variant+')':''}</div><div class="ing-for">Orders: ${s.orderRefs.join(', ')}</div></div>
+          <div class="ing-qty">${i.qty%1===0?i.qty:i.qty.toFixed(2)} ${i.unit}</div>
+        </div>`
+      ).join('');
+      return `<div class="time-block">
+        <div class="tb-head ${urgent&&!past?'urgent':''}">
+          <div class="tb-time">${fmtTime(s.time)}</div>
+          <div class="tb-desc">All items ready by this time • ${s.orderRefs.length} order${s.orderRefs.length>1?'s':''} ${past?'<span style="color:#e74c3c;font-weight:800;">PAST</span>':''}</div>
+        </div>
+        <div class="tb-body">${itemsHtml}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderKitchen() {
     const el = document.getElementById('section-kitchen');
-    // Active orders for today and tomorrow
     const active = allOrders.filter(o =>
       ['pending','confirmed','preparing'].includes(o.status) &&
       (isToday(o.scheduled_time) || isTomorrow(o.scheduled_time))
     );
+    if (!active.length) { el.innerHTML = `<div class="empty"><i class="fas fa-utensils"></i><p>No kitchen work scheduled</p></div>`; return; }
 
-    if (!active.length) {
-      el.innerHTML = `<div class="no-schedule"><i class="fas fa-utensils" style="font-size:2rem;color:#ddd;display:block;margin-bottom:12px;"></i>No upcoming kitchen work</div>`;
-      return;
-    }
+    const slots   = buildSlots(active);
+    const sorted  = Object.keys(slots).sort();
+    const todayK  = sorted.filter(k => isToday(slots[k].time));
+    const tomK    = sorted.filter(k => isTomorrow(slots[k].time));
 
-    // Group by packaging deadline in 30-min slots
-    const slots = {};
-    active.forEach(order => {
-      const packTime = new Date(new Date(order.scheduled_time) - PACK_MINS * 60000);
-      // Round down to nearest 30 min
-      const mins = packTime.getMinutes() < 30 ? 0 : 30;
-      packTime.setMinutes(mins, 0, 0);
-      const key = packTime.toISOString();
-      if (!slots[key]) slots[key] = { time: packTime, items: {}, orders: [] };
-      slots[key].orders.push(order.order_ref || order.id.slice(0,8));
-      (order.order_items || []).forEach(item => {
-        const k = `${item.product_name}${item.variant ? ' ('+item.variant+')' : ''}__${item.unit}`;
-        if (!slots[key].items[k]) slots[key].items[k] = { name: item.product_name, variant: item.variant, unit: item.unit, qty: 0 };
-        slots[key].items[k].qty += item.qty_per_packet * item.packets;
-      });
-    });
-
-    const sortedKeys = Object.keys(slots).sort();
-    const todaySlots = sortedKeys.filter(k => isToday(slots[k].time));
-    const tomSlots   = sortedKeys.filter(k => isTomorrow(slots[k].time));
-
-    function renderSlots(keys, dayLabel) {
-      if (!keys.length) return '';
-      const now = new Date();
-      return `<div class="schedule-day">
-        <div class="schedule-day-title">${dayLabel}</div>
-        ${keys.map(k => {
-          const slot = slots[k];
-          const isUrgent = (slot.time - now) < 7200000 && slot.time > now;
-          const itemsHtml = Object.values(slot.items).map(item =>
-            `<div class="ingredient-line">
-              <div>
-                <div class="ingredient-name">${item.name}${item.variant ? ' <span style="color:#aaa;font-weight:400;">('+item.variant+')</span>' : ''}</div>
-                <div class="ingredient-orders">for orders: ${slots[k].orders.join(', ')}</div>
-              </div>
-              <div class="ingredient-qty">${item.qty % 1 === 0 ? item.qty : item.qty.toFixed(2)} ${item.unit}</div>
-            </div>`
-          ).join('');
-          return `<div class="time-slot ${isUrgent ? 'time-slot-urgent' : ''}">
-            <div class="time-slot-head">
-              <div class="time-slot-time">${fmtTime(slot.time)}</div>
-              <div class="time-slot-label">All items needed packed by this time • ${slot.orders.length} order${slot.orders.length>1?'s':''}</div>
-            </div>
-            <div class="time-slot-body">${itemsHtml}</div>
-          </div>`;
-        }).join('')}
-      </div>`;
-    }
-
-    el.innerHTML = renderSlots(todaySlots, 'Today') + renderSlots(tomSlots, 'Tomorrow');
+    el.innerHTML =
+      (todayK.length ? `<div class="sched-day"><div class="sched-day-title">Today</div>${renderSlotBlock(slots, todayK)}</div>` : '') +
+      (tomK.length   ? `<div class="sched-day"><div class="sched-day-title">Tomorrow</div>${renderSlotBlock(slots, tomK)}</div>` : '');
   }
 
-  /* ── Packaging Schedule ──────────────────────────── */
-  function renderPackagingSchedule() {
+  function renderPackaging() {
     const el = document.getElementById('section-packaging');
     const active = allOrders.filter(o =>
       ['pending','confirmed','preparing'].includes(o.status) &&
       (isToday(o.scheduled_time) || isTomorrow(o.scheduled_time))
     );
+    if (!active.length) { el.innerHTML = `<div class="empty"><i class="fas fa-box"></i><p>No packaging scheduled</p></div>`; return; }
 
-    if (!active.length) {
-      el.innerHTML = `<div class="no-schedule"><i class="fas fa-box" style="font-size:2rem;color:#ddd;display:block;margin-bottom:12px;"></i>No packaging scheduled</div>`;
-      return;
-    }
-
-    // Group by 30-min packaging deadline slots
-    const slots = {};
-    active.forEach(order => {
-      const packTime = new Date(new Date(order.scheduled_time) - PACK_MINS * 60000);
-      const mins = packTime.getMinutes() < 30 ? 0 : 30;
-      packTime.setMinutes(mins, 0, 0);
-      const key = packTime.toISOString();
-      if (!slots[key]) slots[key] = { time: packTime, orders: [] };
-      slots[key].orders.push(order);
+    const slotsMap = {};
+    active.forEach(o => {
+      const pack = new Date(new Date(o.scheduled_time) - PACK_MINS * 60000);
+      const m = pack.getMinutes() < 30 ? 0 : 30;
+      pack.setMinutes(m, 0, 0);
+      const k = pack.toISOString();
+      if (!slotsMap[k]) slotsMap[k] = { time: pack, orders: [] };
+      slotsMap[k].orders.push(o);
     });
 
-    const sortedKeys = Object.keys(slots).sort();
-    const todaySlots = sortedKeys.filter(k => isToday(slots[k].time));
-    const tomSlots   = sortedKeys.filter(k => isTomorrow(slots[k].time));
+    const sorted = Object.keys(slotsMap).sort();
+    const todayK = sorted.filter(k => isToday(slotsMap[k].time));
+    const tomK   = sorted.filter(k => isTomorrow(slotsMap[k].time));
     const now = new Date();
 
-    function renderPackSlots(keys, dayLabel) {
+    function renderPackSlots(keys, label) {
       if (!keys.length) return '';
-      return `<div class="schedule-day">
-        <div class="schedule-day-title">${dayLabel}</div>
-        ${keys.map(k => {
-          const slot = slots[k];
-          const isUrgent = (slot.time - now) < 7200000 && slot.time > now;
-          const ordersHtml = slot.orders.map(o => {
-            const items = (o.order_items || []).map(i =>
-              `<div class="item-line">
-                <span>${i.product_name}${i.variant?' ('+i.variant+')':''}</span>
-                <span style="font-weight:700;">${i.qty_per_packet} ${i.unit} × ${i.packets}</span>
-              </div>`
+      return `<div class="sched-day"><div class="sched-day-title">${label}</div>` +
+        keys.map(k => {
+          const s = slotsMap[k];
+          const diff = s.time - now;
+          const urgent = diff < 7200000 && diff >= 0;
+          const ordersHtml = s.orders.map(o => {
+            const items = (o.order_items||[]).map(i =>
+              `<div class="il"><span>${i.product_name}${i.variant?' ('+i.variant+')':''}</span><span style="font-weight:700;">${i.qty_per_packet}${i.unit}×${i.packets}</span></div>`
             ).join('');
-            return `<div style="background:#f9f9f9;border-radius:8px;padding:10px;margin-bottom:8px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-weight:800;">${o.order_ref || o.id.slice(0,8)}</span>
-                <span style="font-size:0.78rem;color:#888;">${o.order_type==='delivery'?'🚚 '+o.customer_address.split(',')[0]:'🏪 Pickup'} • ${fmtTime(o.scheduled_time)}</span>
+            return `<div style="background:#f9f9f9;border-radius:8px;padding:10px;margin-bottom:6px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.82rem;">
+                <b>${o.order_ref||o.id.slice(0,8)}</b>
+                <span style="color:#888;">${o.order_type==='delivery'?'🚚 '+o.customer_address.split(',')[0]:'🏪 Pickup'} • ${fmtTime(o.scheduled_time)}</span>
               </div>
-              <div class="items-mini" style="margin:0;">${items}</div>
+              <div class="items-box" style="margin:0;">${items}</div>
             </div>`;
           }).join('');
-          return `<div class="time-slot ${isUrgent ? 'time-slot-urgent' : ''}">
-            <div class="time-slot-head">
-              <div class="time-slot-time">${fmtTime(slot.time)}</div>
-              <div class="time-slot-label">Pack by this time — ${slot.orders.length} order${slot.orders.length>1?'s':''}</div>
-            </div>
-            <div class="time-slot-body">${ordersHtml}</div>
+          return `<div class="time-block">
+            <div class="tb-head ${urgent?'urgent':''}"><div class="tb-time">${fmtTime(s.time)}</div><div class="tb-desc">Pack by this time — ${s.orders.length} order${s.orders.length>1?'s':''}</div></div>
+            <div class="tb-body">${ordersHtml}</div>
           </div>`;
-        }).join('')}
-      </div>`;
+        }).join('') + '</div>';
     }
 
-    el.innerHTML = renderPackSlots(todaySlots, 'Today') + renderPackSlots(tomSlots, 'Tomorrow');
+    el.innerHTML = renderPackSlots(todayK, 'Today') + renderPackSlots(tomK, 'Tomorrow');
   }
 
-  /* ── Update order status ─────────────────────────── */
+  /* ── Update status ───────────────────────── */
   async function updateStatus(orderId, newStatus, btn) {
-    btn.classList.add('btn-loading');
-    btn.innerText = 'Updating...';
+    // Safety check — must be a valid DB value
+    if (!VALID_STATUSES.includes(newStatus)) {
+      alert('Invalid status: ' + newStatus); return;
+    }
+    btn.disabled = true;
+    const original = btn.innerText;
+    btn.innerText = '...';
 
     const { data, error } = await sb
       .from('orders')
@@ -587,58 +642,71 @@
 
     if (error) {
       alert('Update failed: ' + error.message);
-      btn.classList.remove('btn-loading');
-      return;
+      btn.disabled = false; btn.innerText = original; return;
     }
 
-    // Trigger email notification to customer via Edge Function
-    fetch(EDGE_FN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_ANON}` },
+    // Fire status update email to customer
+    fetch(EDGE_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPA_ANON}` },
       body: JSON.stringify({
         type: 'UPDATE',
         record: data,
-        old_record: { status: data.status === newStatus ? 'pending' : data.status }
+        old_record: { status: newStatus === 'confirmed' ? 'pending' : 'confirmed' }
       })
     }).catch(() => {});
 
     await loadAll();
   }
 
-  /* ── Inventory ───────────────────────────────────── */
+  /* ── Inventory ───────────────────────────── */
   async function renderInventory() {
     const el = document.getElementById('section-inventory');
 
-    // Sync menu items into inventory table if not already there
-    const existingNames = inventory.map(i => i.product_name);
-    const toAdd = menuItems.filter(p => !existingNames.includes(p.name));
-    if (toAdd.length) {
-      await sb.from('inventory').insert(toAdd.map(p => ({ product_name: p.name, in_stock: true })));
-      const { data } = await sb.from('inventory').select('*');
-      inventory = data || inventory;
+    // FIX 1: Auto-sync products from menu.json into inventory table
+    if (menuItems.length) {
+      const existingNames = inventory.map(i => i.product_name);
+      const toAdd = menuItems.filter(p => !existingNames.includes(p.name));
+      if (toAdd.length) {
+        await sb.from('inventory').insert(toAdd.map(p => ({
+          product_name: p.name,
+          in_stock:     true,
+          stock_qty:    0,
+          unit:         /khandvi|dhokla|khichu|kachori/i.test(p.name) ? 'Kg' : 'Pcs'
+        })));
+        const { data } = await sb.from('inventory').select('*').order('product_name');
+        inventory = data || inventory;
+      }
     }
 
     if (!inventory.length) {
-      el.innerHTML = `<div class="empty"><i class="fas fa-boxes"></i><p>No products found. Make sure menu.json is loaded.</p></div>`;
-      return;
+      el.innerHTML = `<div class="empty"><i class="fas fa-boxes"></i><p>No products found. Check menu.json is accessible.</p></div>`; return;
     }
 
     el.innerHTML = `
-      <div class="section-title">Toggle In Stock / Out of Stock — changes reflect on customer website immediately</div>
-      <div class="inventory-grid">
+      <div class="sec-title">Stock levels — toggle in/out of stock, update quantity anytime</div>
+      <div class="inv-toolbar">
+        <span style="font-size:0.8rem;color:#aaa;">${inventory.length} products synced from menu.json</span>
+      </div>
+      <div class="inv-grid">
         ${inventory.map(item => `
-          <div class="inv-card" id="inv-${item.id}">
+          <div class="inv-card ${item.in_stock?'':'out'}" id="inv-${item.id}">
             <div>
               <div class="inv-name">${item.product_name}</div>
-              <div class="inv-status">Updated: ${new Date(item.updated_at).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</div>
+              <div class="inv-qty">
+                Stock: <input class="qty-input" type="number" min="0" step="0.5"
+                  value="${item.stock_qty||0}"
+                  onchange="updateQty(${item.id}, this.value)"
+                  style="width:60px;display:inline-block;"> ${item.unit}
+              </div>
             </div>
-            <div class="toggle-wrap">
-              <span class="toggle-label ${item.in_stock ? 'in' : 'out'}" id="lbl-${item.id}">
-                ${item.in_stock ? 'In Stock' : 'Out of Stock'}
+            <div class="inv-right">
+              <span style="font-size:0.7rem;font-weight:800;color:${item.in_stock?'var(--success)':'var(--danger)'};" id="ilbl-${item.id}">
+                ${item.in_stock?'In Stock':'Out'}
               </span>
               <label class="toggle">
-                <input type="checkbox" ${item.in_stock ? 'checked' : ''} onchange="toggleStock(${item.id}, this.checked)">
-                <span class="toggle-slider"></span>
+                <input type="checkbox" ${item.in_stock?'checked':''} onchange="toggleStock(${item.id},this.checked)">
+                <span class="toggle-s"></span>
               </label>
             </div>
           </div>`).join('')}
@@ -646,10 +714,18 @@
   }
 
   async function toggleStock(id, inStock) {
-    const lbl = document.getElementById(`lbl-${id}`);
-    lbl.innerText = inStock ? 'In Stock' : 'Out of Stock';
-    lbl.className = `toggle-label ${inStock ? 'in' : 'out'}`;
+    document.getElementById(`ilbl-${id}`).innerText = inStock ? 'In Stock' : 'Out';
+    document.getElementById(`ilbl-${id}`).style.color = inStock ? 'var(--success)' : 'var(--danger)';
+    const card = document.getElementById(`inv-${id}`);
+    card.classList.toggle('out', !inStock);
     await sb.from('inventory').update({ in_stock: inStock }).eq('id', id);
+  }
+
+  async function updateQty(id, qty) {
+    const q = parseFloat(qty) || 0;
+    await sb.from('inventory').update({ stock_qty: q, in_stock: q > 0 }).eq('id', id);
+    const lbl = document.getElementById(`ilbl-${id}`);
+    if (lbl) { lbl.innerText = q > 0 ? 'In Stock' : 'Out'; lbl.style.color = q > 0 ? 'var(--success)' : 'var(--danger)'; }
   }
 </script>
 </body>
