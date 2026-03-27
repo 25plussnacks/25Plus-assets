@@ -659,65 +659,86 @@
     await loadAll();
   }
 
-  /* ── Inventory ───────────────────────────── */
+  /* ── Inventory ───────────────────────────────────── */
   async function renderInventory() {
     const el = document.getElementById('section-inventory');
 
-    // FIX 1: Auto-sync products from menu.json into inventory table
+    // Build flat list of all inventory entries from menu.json
+    // Each variant becomes a separate entry: { product_name, variant, unit }
     if (menuItems.length) {
-      const existingNames = inventory.map(i => i.product_name);
-      const toAdd = menuItems.filter(p => !existingNames.includes(p.name));
-      if (toAdd.length) {
-        await sb.from('inventory').insert(toAdd.map(p => ({
-          product_name: p.name,
-          in_stock:     true,
-          stock_qty:    0,
-          unit:         /khandvi|dhokla|khichu|kachori/i.test(p.name) ? 'Kg' : 'Pcs'
-        })));
-        const { data } = await sb.from('inventory').select('*').order('product_name');
-        inventory = data || inventory;
+      const toSync = [];
+      menuItems.forEach(p => {
+        const unit = p.isKg ? 'Kg' : /khandvi|dhokla|khichu|kachori/i.test(p.name) ? 'Kg' : 'Pcs';
+        if (p.options && p.options.length > 0) {
+          // Variant product — one entry per variant
+          p.options.forEach(opt => {
+            toSync.push({ product_name: p.name, variant: opt.label, unit });
+          });
+        } else {
+          // Simple product — one entry with empty variant
+          toSync.push({ product_name: p.name, variant: '', unit });
+        }
+      });
+
+      // Upsert missing entries
+      for (const entry of toSync) {
+        const exists = inventory.find(i => i.product_name === entry.product_name && i.variant === entry.variant);
+        if (!exists) {
+          await sb.from('inventory').insert({ ...entry, in_stock: true, stock_qty: 0 });
+        }
       }
+
+      // Reload
+      const { data } = await sb.from('inventory').select('*').order('product_name').order('variant');
+      inventory = data || inventory;
     }
 
     if (!inventory.length) {
-      el.innerHTML = `<div class="empty"><i class="fas fa-boxes"></i><p>No products found. Check menu.json is accessible.</p></div>`; return;
+      el.innerHTML = `<div class="empty"><i class="fas fa-boxes"></i><p>No products found.</p></div>`; return;
     }
 
+    // Group by product_name for display
+    const grouped = {};
+    inventory.forEach(item => {
+      if (!grouped[item.product_name]) grouped[item.product_name] = [];
+      grouped[item.product_name].push(item);
+    });
+
+    const cardsHtml = Object.entries(grouped).map(([product, items]) => {
+      return items.map(item => `
+        <div class="inv-card ${item.in_stock?'':'out'}" id="inv-${item.id}">
+          <div>
+            <div class="inv-name">${item.product_name}${item.variant ? ' <span style="color:#aaa;font-weight:400;font-size:0.78rem;">('+item.variant+')</span>' : ''}</div>
+            <div class="inv-qty">
+              Stock:
+              <input class="qty-input" type="number" min="0" step="${item.unit==='Kg'?'0.25':'1'}"
+                value="${item.stock_qty||0}"
+                onchange="updateQty(${item.id}, this.value)"
+                style="width:65px;display:inline-block;">
+              ${item.unit}
+            </div>
+          </div>
+          <div class="inv-right">
+            <span style="font-size:0.7rem;font-weight:800;color:${item.in_stock?'var(--success)':'var(--danger)'};" id="ilbl-${item.id}">
+              ${item.in_stock?'In Stock':'Out'}
+            </span>
+            <label class="toggle">
+              <input type="checkbox" ${item.in_stock?'checked':''} onchange="toggleStock(${item.id},this.checked)">
+              <span class="toggle-s"></span>
+            </label>
+          </div>
+        </div>`).join('');
+    }).join('');
+
     el.innerHTML = `
-      <div class="sec-title">Stock levels — toggle in/out of stock, update quantity anytime</div>
-      <div class="inv-toolbar">
-        <span style="font-size:0.8rem;color:#aaa;">${inventory.length} products synced from menu.json</span>
-      </div>
-      <div class="inv-grid">
-        ${inventory.map(item => `
-          <div class="inv-card ${item.in_stock?'':'out'}" id="inv-${item.id}">
-            <div>
-              <div class="inv-name">${item.product_name}</div>
-              <div class="inv-qty">
-                Stock: <input class="qty-input" type="number" min="0" step="0.5"
-                  value="${item.stock_qty||0}"
-                  onchange="updateQty(${item.id}, this.value)"
-                  style="width:60px;display:inline-block;"> ${item.unit}
-              </div>
-            </div>
-            <div class="inv-right">
-              <span style="font-size:0.7rem;font-weight:800;color:${item.in_stock?'var(--success)':'var(--danger)'};" id="ilbl-${item.id}">
-                ${item.in_stock?'In Stock':'Out'}
-              </span>
-              <label class="toggle">
-                <input type="checkbox" ${item.in_stock?'checked':''} onchange="toggleStock(${item.id},this.checked)">
-                <span class="toggle-s"></span>
-              </label>
-            </div>
-          </div>`).join('')}
-      </div>`;
+      <div class="sec-title">${inventory.length} inventory entries — auto-synced from menu.json</div>
+      <div class="inv-grid">${cardsHtml}</div>`;
   }
 
   async function toggleStock(id, inStock) {
-    document.getElementById(`ilbl-${id}`).innerText = inStock ? 'In Stock' : 'Out';
-    document.getElementById(`ilbl-${id}`).style.color = inStock ? 'var(--success)' : 'var(--danger)';
-    const card = document.getElementById(`inv-${id}`);
-    card.classList.toggle('out', !inStock);
+    document.getElementById(`ilbl-${id}`).innerText     = inStock ? 'In Stock' : 'Out';
+    document.getElementById(`ilbl-${id}`).style.color   = inStock ? 'var(--success)' : 'var(--danger)';
+    document.getElementById(`inv-${id}`).classList.toggle('out', !inStock);
     await sb.from('inventory').update({ in_stock: inStock }).eq('id', id);
   }
 
@@ -725,7 +746,11 @@
     const q = parseFloat(qty) || 0;
     await sb.from('inventory').update({ stock_qty: q, in_stock: q > 0 }).eq('id', id);
     const lbl = document.getElementById(`ilbl-${id}`);
-    if (lbl) { lbl.innerText = q > 0 ? 'In Stock' : 'Out'; lbl.style.color = q > 0 ? 'var(--success)' : 'var(--danger)'; }
+    if (lbl) {
+      lbl.innerText    = q > 0 ? 'In Stock' : 'Out';
+      lbl.style.color  = q > 0 ? 'var(--success)' : 'var(--danger)';
+      document.getElementById(`inv-${id}`).classList.toggle('out', q <= 0);
+    }
   }
 </script>
 </body>
