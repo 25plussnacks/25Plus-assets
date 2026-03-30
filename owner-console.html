@@ -469,103 +469,91 @@
         const unit=p.isKg?'Kg':/khandvi|dhokla|khichu|kachori/i.test(p.name)?'Kg':'Pcs';
         const defCap=unit==='Kg'?5:500;
         if(p.options&&p.options.length>0){
-          p.options.forEach(opt=>entries.push({product_name:p.name,variant:opt.label,unit,default_capacity:defCap}));
+          p.options.forEach(opt=>entries.push({product_name:p.name,variant:opt.label,unit,daily_capacity:defCap}));
         } else {
-          entries.push({product_name:p.name,variant:'',unit,default_capacity:defCap});
+          entries.push({product_name:p.name,variant:'',unit,daily_capacity:defCap});
         }
       });
       for(const e of entries){
         const exists=inventory.find(i=>i.product_name===e.product_name&&i.variant===e.variant);
-        if(!exists) await sb.from('inventory').insert({...e,in_stock:true,stock_qty:0,daily_capacity:0});
+        if(!exists) await sb.from('inventory').insert({product_name:e.product_name,variant:e.variant,unit:e.unit,daily_capacity:e.daily_capacity,in_stock:true});
       }
       const{data}=await sb.from('inventory').select('*').order('product_name').order('variant');
       inventory=data||inventory;
     }
 
-    if(!inventory.length){el.innerHTML=`<div class="empty"><i class="fas fa-boxes"></i><p>No products found.</p></div>`;return;}
+    if(!inventory.length){el.innerHTML='<div class="empty"><i class="fas fa-boxes"></i><p>No products found.</p></div>';return;}
 
+    // Fetch today's available qty for all products
+    const today=new Date().toISOString().slice(0,10);
+    const availMap={};
+    for(const item of inventory){
+      try {
+        const{data}=await sb.rpc('get_available_qty',{p_name:item.product_name,p_variant:item.variant||'',p_date:today});
+        availMap[`${item.product_name}||${item.variant||''}`]=data??item.daily_capacity;
+      } catch(e){ availMap[`${item.product_name}||${item.variant||''}`]=item.daily_capacity; }
+    }
+
+    // Group by product
     const grouped={};
-    inventory.forEach(item=>{ if(!grouped[item.product_name])grouped[item.product_name]=[]; grouped[item.product_name].push(item); });
+    inventory.forEach(item=>{
+      if(!grouped[item.product_name])grouped[item.product_name]=[];
+      grouped[item.product_name].push(item);
+    });
 
     const html=Object.entries(grouped).map(([pname,items])=>
       items.map(item=>{
-        const effectiveCap=item.daily_capacity>0?item.daily_capacity:item.default_capacity;
-        const todayStr2=new Date().toISOString().slice(0,10); const todayBooked=(capacityData||[]).filter(b=>b.product_name===item.product_name&&(b.variant||'')===(item.variant||'')&&b.order_date===todayStr2).reduce((s,b)=>s+parseFloat(b.used_qty||0),0);
-        const remaining=Math.max(0,effectiveCap-todayBooked);
-        const step=item.unit==='Kg'?0.25:1;
-        const isOut=item.stock_qty<=0||!item.in_stock;
+        const key=`${item.product_name}||${item.variant||''}`;
+        const avail=availMap[key]??item.daily_capacity;
+        const isOut=avail<=0;
+        const step=item.unit==='Kg'?'0.25':'1';
         return `<div class="inv-card ${isOut?'out':''}" id="inv-${item.id}">
-          <div class="inv-card-head">
-            <div>
-              <div class="inv-name">${item.product_name}</div>
-              ${item.variant?`<div class="inv-variant">${item.variant}</div>`:''}
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <div>
+                <div class="inv-name">${item.product_name}</div>
+                ${item.variant?`<div style="font-size:0.76rem;color:#aaa;">${item.variant}</div>`:''}
+              </div>
+              <span style="font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:${isOut?'#fde8e8':'#eafaf1'};color:${isOut?'var(--danger)':'var(--success)'};">
+                ${isOut?'Out of Stock':avail%1===0?avail:parseFloat(avail).toFixed(2)+' '+item.unit+' left'}
+              </span>
             </div>
-            <span class="inv-status-badge ${isOut?'out':'in'}" id="ibadge-${item.id}">${isOut?'Out of Stock':'In Stock'}</span>
-          </div>
-
-          <!-- Current stock -->
-          <div class="inv-row">
-            <label>Current Stock</label>
-            <span class="current-qty" id="iqty-${item.id}">${item.stock_qty%1===0?item.stock_qty:parseFloat(item.stock_qty).toFixed(2)}</span>
-            <span class="unit-lbl">${item.unit}</span>
-          </div>
-
-          <!-- Add stock -->
-          <div class="add-stock-row">
-            <input type="number" id="add-${item.id}" min="0" step="${step}" placeholder="Add qty" style="font-family:inherit;">
-            <button class="btn-add-stock" onclick="addStock(${item.id}, '${item.unit}')">+ Add Stock</button>
-          </div>
-
-          <!-- Today capacity -->
-          <div class="cap-row">
-            <label>Daily capacity: <b style="color:var(--dark);">${remaining%1===0?remaining:remaining.toFixed(2)} ${item.unit} left today</b></label>
-            <input type="number" id="cap-${item.id}" min="0" step="${step}" value="${effectiveCap}" style="font-family:inherit;">
-            <button class="btn-save-cap" onclick="saveCap(${item.id})">Save</button>
+            <div style="font-size:0.78rem;color:#888;margin-bottom:10px;">
+              Daily capacity: <b style="color:var(--dark);">${item.daily_capacity} ${item.unit}</b>
+              &nbsp;|&nbsp; Available today: <b style="color:${isOut?'var(--danger)':'var(--success)'};">${isOut?'None':avail+' '+item.unit}</b>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.75rem;color:#aaa;white-space:nowrap;">Set daily capacity:</span>
+              <input id="cap-${item.id}" type="number" min="0" step="${step}" value="${item.daily_capacity}"
+                style="width:70px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:700;text-align:center;outline:none;">
+              <span style="font-size:0.75rem;color:#aaa;">${item.unit}</span>
+              <button onclick="saveCap(${item.id})"
+                style="background:var(--info);color:white;border:none;padding:6px 14px;border-radius:8px;font-weight:700;font-size:0.76rem;cursor:pointer;font-family:inherit;">
+                Save
+              </button>
+              <button onclick="toggleInStock(${item.id},${!isOut})"
+                style="background:${isOut?'var(--success)':'#fde8e8'};color:${isOut?'white':'var(--danger)'};border:none;padding:6px 14px;border-radius:8px;font-weight:700;font-size:0.76rem;cursor:pointer;font-family:inherit;">
+                ${isOut?'Mark In Stock':'Mark Out of Stock'}
+              </button>
+            </div>
           </div>
         </div>`;
       }).join('')
     ).join('');
 
-    el.innerHTML=`<div class="sec-title">${inventory.length} products • Stock updates reflect on customer website immediately</div><div class="inv-grid">${html}</div>`;
+    el.innerHTML=`<div class="sec-title">${inventory.length} products • availability = daily capacity - today's orders</div><div class="inv-grid">${html}</div>`;
   }
 
-  /* Add to existing stock — shows updated total immediately */
-  async function addStock(id, unit){
-    const addInput=document.getElementById(`add-${id}`);
-    const addQty=parseFloat(addInput.value)||0;
-    if(addQty<=0){addInput.focus();return;}
-
-    const item=inventory.find(i=>i.id===id);
-    if(!item)return;
-
-    const newQty=parseFloat(item.stock_qty)+addQty;
-    const{error}=await sb.from('inventory').update({stock_qty:newQty,in_stock:newQty>0}).eq('id',id);
-    if(error){alert('Save failed: '+error.message);return;}
-
-    // Update UI immediately without full reload
-    item.stock_qty=newQty; item.in_stock=newQty>0;
-    const qtyEl=document.getElementById(`iqty-${id}`);
-    const badgeEl=document.getElementById(`ibadge-${id}`);
-    const card=document.getElementById(`inv-${id}`);
-    if(qtyEl) qtyEl.innerText=newQty%1===0?newQty:newQty.toFixed(2);
-    if(badgeEl){ badgeEl.innerText=newQty>0?'In Stock':'Out of Stock'; badgeEl.className=`inv-status-badge ${newQty>0?'in':'out'}`; }
-    if(card) card.classList.toggle('out', newQty<=0);
-    addInput.value='';
-    addInput.placeholder=`✓ Added ${addQty} ${unit}`;
-    setTimeout(()=>addInput.placeholder='Add qty', 2000);
-  }
-
-  /* Save daily capacity */
   async function saveCap(id){
-    const capInput=document.getElementById(`cap-${id}`);
-    const cap=parseFloat(capInput.value)||0;
-    const{error}=await sb.from('inventory').update({daily_capacity:cap}).eq('id',id);
+    const val=parseFloat(document.getElementById(`cap-${id}`).value)||0;
+    const{error}=await sb.from('inventory').update({daily_capacity:val,in_stock:val>0}).eq('id',id);
     if(error){alert('Save failed: '+error.message);return;}
-    const item=inventory.find(i=>i.id===id);
-    if(item) item.daily_capacity=cap;
-    capInput.style.borderColor='var(--success)';
-    setTimeout(()=>capInput.style.borderColor='',2000);
+    await loadAll();
   }
-</script>
-</body>
-</html>
+
+  async function toggleInStock(id, inStock){
+    await sb.from('inventory').update({in_stock:inStock}).eq('id',id);
+    await loadAll();
+  }
+
+  
